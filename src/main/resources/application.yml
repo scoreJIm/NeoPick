@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: neopick-api
+  profiles:
+    active: dev
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+    serialization:
+      write-dates-as-timestamps: false
+    default-property-inclusion: non_null
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when_authorized
+
+neopick:
+  jwt:
+    access-token-expiration: 2h
+    refresh-token-expiration: 30d
+  sms:
+    code-length: 6
+    code-ttl: 300
+    resend-cooldown: 60
+    daily-limit: 5
+  booking:
+    pending-confirm-timeout: 24h
+    pending-pay-timeout: 2h

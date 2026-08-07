@@ -1,0 +1,44 @@
+spring:
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: 6379
+      ssl:
+        enabled: true
+
+neopick:
+  jwt:
+    secret: ${JWT_SECRET}
+  sms:
+    provider: aliyun
+    aliyun:
+      access-key-id: ${ALIYUN_ACCESS_KEY_ID}
+      access-key-secret: ${ALIYUN_ACCESS_KEY_SECRET}
+      sign-name: Neopick
+      template-code: ${ALIYUN_SMS_TEMPLATE_CODE}
+  aws:
+    region: us-east-1
+    s3:
+      bucket: neopick-prod-media
+    sns:
+      booking-events-topic: ${SNS_BOOKING_EVENTS_TOPIC_ARN}
+
+  logging:
+    level:
+      com.neopick: INFO
+      org.springframework.web: WARN
