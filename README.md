@@ -51,8 +51,8 @@ shared/           ← Result monad, constants, base classes
 ### Local dev (H2, no Docker needed)
 
 ```bash
-git clone git@github.com:scoreJIm/neopick-case-study-repo.git
-cd neopick-case-study-repo
+git clone git@github.com:scoreJIm/NeoPick.git
+cd NeoPick
 mvn spring-boot:run -Dspring-boot.run.profiles=local
 ```
 
