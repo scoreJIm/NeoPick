@@ -8,6 +8,7 @@ import com.neopick.adapter.web.dto.common.PageResponse;
 import com.neopick.application.booking.*;
 import com.neopick.domain.booking.Booking;
 import com.neopick.shared.Constants;
+import io.micrometer.core.annotation.Timed;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +34,7 @@ public class BookingController {
     }
 
     @PostMapping
+    @Timed(value = "neopick.bookings.submit", description = "Booking submission")
     public ApiResponse<BookingResponse> submit(@Valid @RequestBody SubmitBookingRequest request) {
         Booking booking = submitBookingUseCase.execute(new SubmitBookingUseCase.SubmitBookingCommand(
                 request.teacherId(), request.scheduledStart(), request.durationMinutes(),
@@ -59,6 +61,7 @@ public class BookingController {
     }
 
     @PutMapping("/{id}/confirm")
+    @Timed(value = "neopick.bookings.confirm")
     public ApiResponse<BookingResponse> confirm(@PathVariable String id) {
         Booking booking = manageBookingUseCase.confirm(id);
         return ApiResponse.success(BookingResponse.from(booking));
@@ -79,6 +82,7 @@ public class BookingController {
     }
 
     @PutMapping("/{id}/complete")
+    @Timed(value = "neopick.bookings.complete")
     public ApiResponse<BookingResponse> complete(@PathVariable String id) {
         Booking booking = manageBookingUseCase.complete(id);
         return ApiResponse.success(BookingResponse.from(booking));
