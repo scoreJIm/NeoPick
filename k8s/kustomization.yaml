@@ -1,0 +1,34 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - deployment.yaml
+  - service.yaml
+  - ingress.yaml
+
+commonLabels:
+  app.kubernetes.io/name: neopick-api
+  app.kubernetes.io/part-of: neopick
+
+images:
+  - name: ${ECR_REGISTRY}/neopick-api
+    newTag: ${IMAGE_TAG}
+
+configMapGenerator:
+  - name: neopick-api-config
+    behavior: replace
+    literals:
+      - SERVER_PORT=8080
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
+      - SPRING_DATA_REDIS_PORT=6379
+      - NEOPICK_SMS_PROVIDER=aliyun
+      - NEOPICK_PAYMENT_PROVIDERS=wechat,alipay
+      - NEOPICK_JWT_ACCESS_EXPIRATION_MINUTES=30
+      - NEOPICK_JWT_REFRESH_EXPIRATION_DAYS=7
+
+secretGenerator:
+  - name: neopick-api-secret
+    behavior: replace
+    literals:
+      - placeholder=true
