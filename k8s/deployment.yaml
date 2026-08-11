@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neopick-api
+  labels:
+    app: neopick-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: neopick-api
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: neopick-api
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: neopick-api
+          image: ${ECR_REGISTRY}/neopick-api:${IMAGE_TAG}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: neopick-api-config
+            - secretRef:
+                name: neopick-api-secret
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: prod
+          resources:
+            requests:
+              cpu: 500m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: neopick-api-config
+data:
+  SERVER_PORT: "8080"
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://${RDS_HOST}:5432/neopick"
+  SPRING_DATASOURCE_DRIVER_CLASS_NAME: "org.postgresql.Driver"
+  SPRING_JPA_HIBERNATE_DDL_AUTO: "validate"
+  SPRING_DATA_REDIS_HOST: "${REDIS_HOST}"
+  SPRING_DATA_REDIS_PORT: "6379"
+  AWS_REGION: "${AWS_REGION}"
+  NEOPICK_SMS_PROVIDER: "aliyun"
+  NEOPICK_PAYMENT_PROVIDERS: "wechat,alipay"
+  NEOPICK_JWT_ACCESS_EXPIRATION_MINUTES: "30"
+  NEOPICK_JWT_REFRESH_EXPIRATION_DAYS: "7"
+  NEOPICK_S3_BUCKET: "${S3_BUCKET}"
+  NEOPICK_CDN_DOMAIN: "${CDN_DOMAIN}"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: neopick-api-secret
+type: Opaque
+stringData:
+  SPRING_DATASOURCE_USERNAME: "${DB_USERNAME}"
+  SPRING_DATASOURCE_PASSWORD: "${DB_PASSWORD}"
+  SPRING_DATA_REDIS_PASSWORD: "${REDIS_PASSWORD}"
+  NEOPICK_JWT_SECRET: "${JWT_SECRET}"
+  NEOPICK_ALIYUN_SMS_ACCESS_KEY: "${ALIYUN_ACCESS_KEY}"
+  NEOPICK_ALIYUN_SMS_SECRET_KEY: "${ALIYUN_SECRET_KEY}"
+  NEOPICK_WECHAT_APP_ID: "${WECHAT_APP_ID}"
+  NEOPICK_WECHAT_API_KEY: "${WECHAT_API_KEY}"
+  NEOPICK_ALIPAY_APP_ID: "${ALIPAY_APP_ID}"
+  NEOPICK_ALIPAY_PRIVATE_KEY: "${ALIPAY_PRIVATE_KEY}"
+  AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
+  AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"

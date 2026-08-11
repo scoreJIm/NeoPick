@@ -16,10 +16,16 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: health,info,metrics,prometheus
   endpoint:
     health:
       show-details: when_authorized
+  metrics:
+    tags:
+      application: neopick-api
+  tracing:
+    sampling:
+      probability: 0.1
 
 neopick:
   jwt:
