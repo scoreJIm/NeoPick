@@ -5,6 +5,7 @@ import com.neopick.domain.auth.SmsCodeService;
 import com.neopick.domain.auth.TokenPair;
 import com.neopick.domain.user.User;
 import com.neopick.domain.user.UserRepository;
+import com.neopick.infrastructure.metrics.BusinessMetrics;
 import com.neopick.port.security.TokenProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,12 +16,14 @@ public class LoginUseCase {
     private final SmsCodeService smsCodeService;
     private final UserRepository userRepository;
     private final TokenProvider tokenProvider;
+    private final BusinessMetrics metrics;
 
     public LoginUseCase(SmsCodeService smsCodeService, UserRepository userRepository,
-                        TokenProvider tokenProvider) {
+                        TokenProvider tokenProvider, BusinessMetrics metrics) {
         this.smsCodeService = smsCodeService;
         this.userRepository = userRepository;
         this.tokenProvider = tokenProvider;
+        this.metrics = metrics;
     }
 
     @Transactional
@@ -47,7 +50,9 @@ public class LoginUseCase {
                 com.neopick.domain.user.PhoneNumber.of(phone),
                 "User_" + phone.substring(phone.length() - 4),
                 com.neopick.domain.user.UserRole.STUDENT);
-        return userRepository.save(user);
+        User saved = userRepository.save(user);
+        metrics.userRegistered();
+        return saved;
     }
 
     public record LoginCommand(String phone, String code) {}

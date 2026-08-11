@@ -3,6 +3,7 @@ package com.neopick.application.booking;
 import com.neopick.domain.booking.Booking;
 import com.neopick.domain.booking.BookingId;
 import com.neopick.domain.booking.BookingRepository;
+import com.neopick.infrastructure.metrics.BusinessMetrics;
 import com.neopick.port.security.SecurityContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,10 +13,13 @@ public class ManageBookingUseCase {
 
     private final BookingRepository bookingRepository;
     private final SecurityContext securityContext;
+    private final BusinessMetrics metrics;
 
-    public ManageBookingUseCase(BookingRepository bookingRepository, SecurityContext securityContext) {
+    public ManageBookingUseCase(BookingRepository bookingRepository, SecurityContext securityContext,
+                                 BusinessMetrics metrics) {
         this.bookingRepository = bookingRepository;
         this.securityContext = securityContext;
+        this.metrics = metrics;
     }
 
     private Booking getBooking(String bookingId) {
@@ -27,14 +31,18 @@ public class ManageBookingUseCase {
     public Booking confirm(String bookingId) {
         Booking booking = getBooking(bookingId);
         booking.confirm();
-        return bookingRepository.save(booking);
+        Booking saved = bookingRepository.save(booking);
+        metrics.bookingConfirmed();
+        return saved;
     }
 
     @Transactional
     public Booking reject(String bookingId, String reason) {
         Booking booking = getBooking(bookingId);
         booking.reject(reason);
-        return bookingRepository.save(booking);
+        Booking saved = bookingRepository.save(booking);
+        metrics.bookingCancelled();
+        return saved;
     }
 
     @Transactional
@@ -42,14 +50,18 @@ public class ManageBookingUseCase {
         String userId = securityContext.requireCurrentUserId();
         Booking booking = getBooking(bookingId);
         booking.cancel(reason, userId);
-        return bookingRepository.save(booking);
+        Booking saved = bookingRepository.save(booking);
+        metrics.bookingCancelled();
+        return saved;
     }
 
     @Transactional
     public Booking complete(String bookingId) {
         Booking booking = getBooking(bookingId);
         booking.complete();
-        return bookingRepository.save(booking);
+        Booking saved = bookingRepository.save(booking);
+        metrics.bookingCompleted();
+        return saved;
     }
 
     public Booking getDetail(String bookingId) {

@@ -3,6 +3,7 @@ package com.neopick.application.review;
 import com.neopick.domain.review.Review;
 import com.neopick.domain.review.ReviewId;
 import com.neopick.domain.review.ReviewRepository;
+import com.neopick.infrastructure.metrics.BusinessMetrics;
 import com.neopick.port.security.SecurityContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,10 +15,13 @@ public class SubmitReviewUseCase {
 
     private final ReviewRepository reviewRepository;
     private final SecurityContext securityContext;
+    private final BusinessMetrics metrics;
 
-    public SubmitReviewUseCase(ReviewRepository reviewRepository, SecurityContext securityContext) {
+    public SubmitReviewUseCase(ReviewRepository reviewRepository, SecurityContext securityContext,
+                               BusinessMetrics metrics) {
         this.reviewRepository = reviewRepository;
         this.securityContext = securityContext;
+        this.metrics = metrics;
     }
 
     @Transactional
@@ -29,7 +33,9 @@ public class SubmitReviewUseCase {
         Review review = new Review(ReviewId.generate(), command.bookingId(),
                 studentId, command.teacherId(), command.rating(),
                 command.content(), command.tags());
-        return reviewRepository.save(review);
+        Review saved = reviewRepository.save(review);
+        metrics.reviewSubmitted();
+        return saved;
     }
 
     public record SubmitReviewCommand(

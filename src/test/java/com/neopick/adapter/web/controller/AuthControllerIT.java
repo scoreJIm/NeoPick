@@ -33,6 +33,7 @@ class AuthControllerIT {
     @MockBean private SmsCodeService smsCodeService;
     @MockBean private UserRepository userRepository;
     @MockBean private TokenProvider tokenProvider;
+    @MockBean private com.neopick.infrastructure.metrics.BusinessMetrics businessMetrics;
 
     private static final String PHONE = "13800138000";
     private static final String CODE = "123456";

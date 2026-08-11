@@ -1,6 +1,7 @@
 package com.neopick.application.booking;
 
 import com.neopick.domain.booking.*;
+import com.neopick.infrastructure.metrics.BusinessMetrics;
 import com.neopick.port.security.SecurityContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,10 +14,13 @@ public class SubmitBookingUseCase {
 
     private final BookingRepository bookingRepository;
     private final SecurityContext securityContext;
+    private final BusinessMetrics metrics;
 
-    public SubmitBookingUseCase(BookingRepository bookingRepository, SecurityContext securityContext) {
+    public SubmitBookingUseCase(BookingRepository bookingRepository, SecurityContext securityContext,
+                                BusinessMetrics metrics) {
         this.bookingRepository = bookingRepository;
         this.securityContext = securityContext;
+        this.metrics = metrics;
     }
 
     @Transactional
@@ -30,7 +34,9 @@ public class SubmitBookingUseCase {
                 new Address(command.addressLabel(), command.addressDetail(),
                         command.latitude(), command.longitude()),
                 command.note());
-        return bookingRepository.save(booking);
+        Booking saved = bookingRepository.save(booking);
+        metrics.bookingSubmitted();
+        return saved;
     }
 
     public record SubmitBookingCommand(

@@ -39,6 +39,7 @@ class ReviewControllerIT {
 
     @MockBean private ReviewRepository reviewRepository;
     @MockBean private SecurityContext securityContext;
+    @MockBean private com.neopick.infrastructure.metrics.BusinessMetrics businessMetrics;
 
     private static final String STUDENT_ID = "student-001";
     private static final Long TEACHER_ID = 100L;

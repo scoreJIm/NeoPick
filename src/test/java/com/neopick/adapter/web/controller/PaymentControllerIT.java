@@ -35,6 +35,7 @@ class PaymentControllerIT {
     @MockBean private PaymentRepository paymentRepository;
     @MockBean private BookingRepository bookingRepository;
     @MockBean private SecurityContext securityContext;
+    @MockBean private com.neopick.infrastructure.metrics.BusinessMetrics businessMetrics;
 
     private static final UUID BOOKING_UUID = UUID.randomUUID();
     private static final UUID PAYMENT_UUID = UUID.randomUUID();
