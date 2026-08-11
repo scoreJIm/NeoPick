@@ -1,0 +1,40 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:neopick_test;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: false
+  flyway:
+    enabled: false
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 100ms
+  sql:
+    init:
+      mode: never
+
+neopick:
+  jwt:
+    secret: test-secret-at-least-256-bits-long-for-hs256-algorithm
+  sms:
+    provider: mock
+  aws:
+    region: us-east-1
+    s3:
+      bucket: neopick-test
+    sns:
+      booking-events-topic: arn:aws:sns:us-east-1:000000000000:neopick-test-booking-events
+
+logging:
+  level:
+    com.neopick: WARN
+    org.springframework: WARN
