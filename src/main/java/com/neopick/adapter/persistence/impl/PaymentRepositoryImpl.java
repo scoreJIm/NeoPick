@@ -49,9 +49,10 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     }
 
     private Payment toDomain(PaymentJpaEntity e) {
-        Payment p = new Payment(
+        return Payment.reconstruct(
                 new PaymentId(e.getId()), e.getBookingId(), e.getAmount(),
-                PaymentMethod.valueOf(e.getMethod()));
-        return p;
+                PaymentMethod.valueOf(e.getMethod()), PaymentStatus.valueOf(e.getStatus()),
+                e.getTransactionId(), e.getPaidAt(), e.getRefundedAt(),
+                e.getCreatedAt(), e.getUpdatedAt());
     }
 }

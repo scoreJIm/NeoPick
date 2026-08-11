@@ -31,6 +31,24 @@ public class Payment implements AggregateRoot {
         this.updatedAt = LocalDateTime.now();
     }
 
+    static Payment reconstruct(PaymentId id, String bookingId, BigDecimal amount,
+            PaymentMethod method, PaymentStatus status, String transactionId,
+            LocalDateTime paidAt, LocalDateTime refundedAt,
+            LocalDateTime createdAt, LocalDateTime updatedAt) {
+        Payment p = new Payment();
+        p.id = id;
+        p.bookingId = bookingId;
+        p.amount = amount;
+        p.method = method;
+        p.status = status;
+        p.transactionId = transactionId;
+        p.paidAt = paidAt;
+        p.refundedAt = refundedAt;
+        p.createdAt = createdAt;
+        p.updatedAt = updatedAt;
+        return p;
+    }
+
     public void markPaid(String transactionId) {
         this.status = PaymentStatus.PAID;
         this.transactionId = transactionId;

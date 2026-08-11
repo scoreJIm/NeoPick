@@ -89,14 +89,16 @@ public class BookingRepositoryImpl implements BookingRepository {
     }
 
     private Booking toDomain(BookingJpaEntity e) {
-        Booking b = new Booking(
+        return Booking.reconstruct(
                 new BookingId(e.getId()), e.getStudentId(), e.getTeacherId(),
+                BookingStatus.valueOf(e.getStatus()),
                 e.getScheduledStart(), e.getScheduledEnd(), e.getDurationMinutes(),
                 e.getPrice(),
                 new Address(e.getAddressLabel(), e.getAddressDetail(),
                         e.getAddressLat() != null ? e.getAddressLat().doubleValue() : 0,
                         e.getAddressLng() != null ? e.getAddressLng().doubleValue() : 0),
-                e.getStudentNote());
-        return b;
+                e.getStudentNote(), e.getCancelReason(), e.getCancelledBy(),
+                e.getConfirmedAt(), e.getPaidAt(), e.getCompletedAt(),
+                e.getCancelledAt(), e.getCreatedAt(), e.getUpdatedAt());
     }
 }

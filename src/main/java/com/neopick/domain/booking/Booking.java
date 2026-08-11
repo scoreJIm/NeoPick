@@ -47,6 +47,34 @@ public class Booking implements AggregateRoot {
         this.updatedAt = LocalDateTime.now();
     }
 
+    static Booking reconstruct(BookingId id, String studentId, Long teacherId,
+            BookingStatus status, LocalDateTime scheduledStart, LocalDateTime scheduledEnd,
+            int durationMinutes, BigDecimal price, Address address, String studentNote,
+            String cancelReason, String cancelledBy, LocalDateTime confirmedAt,
+            LocalDateTime paidAt, LocalDateTime completedAt, LocalDateTime cancelledAt,
+            LocalDateTime createdAt, LocalDateTime updatedAt) {
+        Booking b = new Booking();
+        b.id = id;
+        b.studentId = studentId;
+        b.teacherId = teacherId;
+        b.status = status;
+        b.scheduledStart = scheduledStart;
+        b.scheduledEnd = scheduledEnd;
+        b.durationMinutes = durationMinutes;
+        b.price = price;
+        b.address = address;
+        b.studentNote = studentNote;
+        b.cancelReason = cancelReason;
+        b.cancelledBy = cancelledBy;
+        b.confirmedAt = confirmedAt;
+        b.paidAt = paidAt;
+        b.completedAt = completedAt;
+        b.cancelledAt = cancelledAt;
+        b.createdAt = createdAt;
+        b.updatedAt = updatedAt;
+        return b;
+    }
+
     public void confirm() {
         assertStatus(BookingStatus.PENDING_CONFIRM, "confirm");
         this.status = BookingStatus.PENDING_PAY;
