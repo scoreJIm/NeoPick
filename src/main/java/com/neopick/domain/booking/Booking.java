@@ -47,7 +47,7 @@ public class Booking implements AggregateRoot {
         this.updatedAt = LocalDateTime.now();
     }
 
-    static Booking reconstruct(BookingId id, String studentId, Long teacherId,
+    public static Booking reconstruct(BookingId id, String studentId, Long teacherId,
             BookingStatus status, LocalDateTime scheduledStart, LocalDateTime scheduledEnd,
             int durationMinutes, BigDecimal price, Address address, String studentNote,
             String cancelReason, String cancelledBy, LocalDateTime confirmedAt,

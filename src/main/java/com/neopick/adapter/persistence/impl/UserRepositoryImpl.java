@@ -55,11 +55,16 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     private User toDomain(UserJpaEntity entity) {
-        UserId id = new UserId(entity.getId());
-        PhoneNumber phone = PhoneNumber.of(entity.getPhone());
-        Gender gender = entity.getGender() != null ? Gender.valueOf(entity.getGender()) : null;
-        UserRole role = UserRole.valueOf(entity.getRole());
-        User user = new User(id, phone, entity.getNickname(), role);
-        return user;
+        return User.reconstruct(
+                new UserId(entity.getId()),
+                PhoneNumber.of(entity.getPhone()),
+                entity.getNickname(),
+                entity.getAvatarUrl(),
+                entity.getGender() != null ? Gender.valueOf(entity.getGender()) : null,
+                UserRole.valueOf(entity.getRole()),
+                UserStatus.valueOf(entity.getStatus()),
+                entity.getRegisteredAt(),
+                entity.getUpdatedAt(),
+                entity.getLastLoginAt());
     }
 }

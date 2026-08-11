@@ -30,6 +30,23 @@ public class User implements AggregateRoot {
         this.updatedAt = LocalDateTime.now();
     }
 
+    public static User reconstruct(UserId id, PhoneNumber phone, String nickname, String avatarUrl,
+            Gender gender, UserRole role, UserStatus status,
+            LocalDateTime registeredAt, LocalDateTime updatedAt, LocalDateTime lastLoginAt) {
+        User u = new User();
+        u.id = id;
+        u.phone = phone;
+        u.nickname = nickname;
+        u.avatarUrl = avatarUrl;
+        u.gender = gender;
+        u.role = role;
+        u.status = status;
+        u.registeredAt = registeredAt;
+        u.updatedAt = updatedAt;
+        u.lastLoginAt = lastLoginAt;
+        return u;
+    }
+
     public void updateProfile(String nickname, Gender gender, String avatarUrl) {
         this.nickname = nickname != null ? nickname : this.nickname;
         this.gender = gender != null ? gender : this.gender;
