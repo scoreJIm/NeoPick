@@ -95,7 +95,7 @@ class PaymentReviewE2ETest extends BaseIntegrationTest {
 
         // Step 4: Verify payment persisted
         Optional<Payment> savedPayment = paymentRepository.findById(
-                PaymentId.from(UUID.fromString(paymentId)));
+                new PaymentId(UUID.fromString(paymentId)));
         assertThat(savedPayment).isPresent();
         assertThat(savedPayment.get().getBookingId()).isEqualTo(bookingId);
 

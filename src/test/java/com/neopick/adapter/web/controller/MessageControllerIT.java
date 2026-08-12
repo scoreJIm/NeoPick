@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.*;
@@ -33,7 +34,7 @@ class MessageControllerIT {
     @MockBean private ConversationRepository conversationRepository;
     @MockBean private SecurityContext securityContext;
 
-    private static final String CONV_ID = "conv-001";
+    private static final String CONV_ID = "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
     private static final ConversationId CONVERSATION_ID = ConversationId.from(CONV_ID);
 
     @BeforeEach
@@ -84,8 +85,8 @@ class MessageControllerIT {
         @Test
         @DisplayName("should send a message in conversation")
         void shouldSendMessage() throws Exception {
-            var msg = new ChatMessage(CONVERSATION_ID, "student-001", "Hello!",
-                    MessageType.TEXT);
+            var msg = new ChatMessage(UUID.randomUUID(), CONV_ID, "student-001",
+                    "100", "Hello!", MessageType.TEXT);
             when(conversationRepository.findById(CONVERSATION_ID))
                     .thenReturn(Optional.of(new Conversation(CONVERSATION_ID, "student-001", 100L)));
             when(conversationRepository.saveMessage(any(ChatMessage.class))).thenReturn(msg);
@@ -114,8 +115,9 @@ class MessageControllerIT {
         @Test
         @DisplayName("should return messages in conversation")
         void shouldReturnMessages() throws Exception {
-            var msg = new ChatMessage(CONVERSATION_ID, "student-001", "Hi", MessageType.TEXT);
-            when(conversationRepository.findMessages(CONVERSATION_ID, 0, 50))
+            var msg = new ChatMessage(UUID.randomUUID(), CONV_ID, "student-001",
+                    "100", "Hi", MessageType.TEXT);
+            when(conversationRepository.findMessages(CONV_ID, 0, 50))
                     .thenReturn(List.of(msg));
 
             mockMvc.perform(get("/api/v1/conversations/{id}/messages", CONV_ID))

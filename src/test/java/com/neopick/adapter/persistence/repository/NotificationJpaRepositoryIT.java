@@ -104,7 +104,7 @@ class NotificationJpaRepositoryIT {
         entity.setUserId(userId);
         entity.setType(type);
         entity.setTitle(message);
-        entity.setMessage(message);
+        entity.setContent(message);
         entity.setRead(read);
         entity.setReferenceId("ref-" + UUID.randomUUID().toString().substring(0, 8));
         return entity;

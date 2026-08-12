@@ -46,8 +46,8 @@ class NotificationControllerIT {
         @DisplayName("should return notifications")
         void shouldReturnNotifications() throws Exception {
             var notif = new Notification(NotificationId.generate(), "student-001",
-                    "Teacher John confirmed your booking", NotificationType.BOOKING,
-                    "booking-123");
+                    "Booking confirmed", "Teacher John confirmed your booking",
+                    NotificationType.BOOKING, "booking-123");
             when(notificationRepository.findByUserId(eq("student-001"), isNull(), anyInt(), anyInt()))
                     .thenReturn(List.of(notif));
 

@@ -1,5 +1,6 @@
 package com.neopick.adapter.web.controller;
 
+import com.neopick.application.payment.HandlePaymentCallbackUseCase;
 import com.neopick.application.payment.InitiatePaymentUseCase;
 import com.neopick.domain.booking.*;
 import com.neopick.domain.payment.*;
@@ -38,6 +39,8 @@ class PaymentControllerIT {
     @MockBean private BookingRepository bookingRepository;
     @MockBean private SecurityContext securityContext;
     @MockBean private com.neopick.infrastructure.metrics.BusinessMetrics businessMetrics;
+    @MockBean private PaymentGateway paymentGateway;
+    @MockBean private HandlePaymentCallbackUseCase handlePaymentCallbackUseCase;
 
     private static final UUID BOOKING_UUID = UUID.randomUUID();
     private static final UUID PAYMENT_UUID = UUID.randomUUID();
@@ -45,10 +48,14 @@ class PaymentControllerIT {
     @BeforeEach
     void setUp() {
         when(securityContext.requireCurrentUserId()).thenReturn("student-001");
+        when(paymentGateway.supportedMethod()).thenReturn("WECHAT");
+        when(paymentGateway.initiatePayment(any(), any()))
+                .thenReturn(new PaymentGateway.InitiatePaymentResult(
+                        true, "txn-001", "https://pay.example.com/order/test", null));
     }
 
     @Nested
-    @DisplayName("POST /api/v1/payments — Initiate payment")
+    @DisplayName("POST /api/v1/payments - Initiate payment")
     class InitiatePayment {
 
         @Test

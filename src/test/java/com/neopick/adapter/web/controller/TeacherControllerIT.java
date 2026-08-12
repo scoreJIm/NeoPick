@@ -187,7 +187,7 @@ class TeacherControllerIT {
         @Test
         @DisplayName("should return weekly recommendations")
         void shouldReturnWeeklyRecommendations() throws Exception {
-            when(teacherRepository.findWeeklyRecommendations(anyString(), anyInt()))
+            when(teacherRepository.findPopular(anyString(), anyInt()))
                     .thenReturn(List.of(teacher));
 
             mockMvc.perform(get("/api/v1/teachers/weekly-recommendations")

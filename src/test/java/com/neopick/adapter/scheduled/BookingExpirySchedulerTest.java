@@ -59,7 +59,7 @@ class BookingExpirySchedulerTest {
     void shouldCancelExpiredPaymentsAndUpdateBookings() {
         PaymentJpaEntity expired = new PaymentJpaEntity();
         expired.setId(java.util.UUID.randomUUID());
-        expired.setBookingId("booking-123");
+        expired.setBookingId(java.util.UUID.randomUUID().toString());
         expired.setStatus("PENDING");
         expired.setCreatedAt(LocalDateTime.now().minusHours(3));
 
