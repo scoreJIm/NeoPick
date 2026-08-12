@@ -8,6 +8,7 @@ const routes = [
   { path: '/teachers/:id', name: 'teacher', component: () => import('./views/TeacherDetail.vue') },
   { path: '/login', name: 'login', component: () => import('./views/Login.vue') },
   { path: '/bookings', name: 'bookings', component: () => import('./views/Bookings.vue') },
+  { path: '/chat', name: 'chat', component: () => import('./views/Chat.vue') },
 ]
 
 const router = createRouter({ history: createWebHistory(), routes })

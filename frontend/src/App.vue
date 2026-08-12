@@ -5,6 +5,7 @@
       <nav>
         <template v-if="auth.isLoggedIn">
           <router-link to="/bookings">My Bookings</router-link>
+          <router-link to="/chat">Chat</router-link>
           <a href="#" @click.prevent="auth.logout()">Logout</a>
         </template>
         <router-link v-else to="/login">Login</router-link>
