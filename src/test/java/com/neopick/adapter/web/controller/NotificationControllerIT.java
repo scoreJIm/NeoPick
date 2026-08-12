@@ -46,7 +46,7 @@ class NotificationControllerIT {
         @DisplayName("should return notifications")
         void shouldReturnNotifications() throws Exception {
             var notif = new Notification(NotificationId.generate(), "student-001",
-                    "Teacher John confirmed your booking", NotificationType.BOOKING_CONFIRMED,
+                    "Teacher John confirmed your booking", NotificationType.BOOKING,
                     "booking-123");
             when(notificationRepository.findByUserId(eq("student-001"), isNull(), anyInt(), anyInt()))
                     .thenReturn(List.of(notif));
@@ -54,17 +54,17 @@ class NotificationControllerIT {
             mockMvc.perform(get("/api/v1/notifications"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.data", hasSize(1)))
-                    .andExpect(jsonPath("$.data[0].type").value("BOOKING_CONFIRMED"));
+                    .andExpect(jsonPath("$.data[0].type").value("BOOKING"));
         }
 
         @Test
         @DisplayName("should filter by notification type")
         void shouldFilterByType() throws Exception {
-            when(notificationRepository.findByUserId(eq("student-001"), eq(NotificationType.BOOKING_CONFIRMED), anyInt(), anyInt()))
+            when(notificationRepository.findByUserId(eq("student-001"), eq(NotificationType.BOOKING), anyInt(), anyInt()))
                     .thenReturn(List.of());
 
             mockMvc.perform(get("/api/v1/notifications")
-                            .param("type", "BOOKING_CONFIRMED"))
+                            .param("type", "BOOKING"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.data", hasSize(0)));
         }
@@ -101,7 +101,7 @@ class NotificationControllerIT {
         @Test
         @DisplayName("should return unread count")
         void shouldReturnUnreadCount() throws Exception {
-            when(notificationRepository.countUnread("student-001")).thenReturn(5L);
+            when(notificationRepository.countByUserIdAndReadFalse("student-001")).thenReturn(5L);
 
             mockMvc.perform(get("/api/v1/notifications/unread-count"))
                     .andExpect(status().isOk())

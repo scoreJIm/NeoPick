@@ -3,6 +3,7 @@ package com.neopick.adapter.web.controller;
 import com.neopick.application.payment.InitiatePaymentUseCase;
 import com.neopick.domain.booking.*;
 import com.neopick.domain.payment.*;
+import com.neopick.port.payment.PaymentGateway;
 import com.neopick.port.security.SecurityContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;

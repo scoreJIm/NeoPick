@@ -20,13 +20,13 @@ class GlobalExceptionHandlerTest {
 
     @Nested
     @DisplayName("BusinessException → 400")
-    class BusinessException {
+    class HandleBusinessException {
 
         @Test
         @DisplayName("should return 400 with error code")
         void shouldReturnBadRequest() {
             ResponseEntity<ErrorResponse> resp = handler.handleBusiness(
-                    new BusinessException("BOOKING_NOT_FOUND", "Booking does not exist"));
+                    new com.neopick.domain.common.BusinessException("BOOKING_NOT_FOUND", "Booking does not exist"));
 
             assertThat(resp.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
             assertThat(resp.getBody().message()).contains("Booking does not exist");
@@ -36,13 +36,13 @@ class GlobalExceptionHandlerTest {
 
     @Nested
     @DisplayName("IllegalArgumentException → 400")
-    class IllegalArgumentException {
+    class HandleIllegalArgument {
 
         @Test
         @DisplayName("should return 400 with INVALID_ARGUMENT code")
         void shouldReturnBadRequest() {
             ResponseEntity<ErrorResponse> resp = handler.handleIllegalArgument(
-                    new IllegalArgumentException("Invalid phone number"));
+                    new java.lang.IllegalArgumentException("Invalid phone number"));
 
             assertThat(resp.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
             assertThat(resp.getBody().errorCode()).isEqualTo("INVALID_ARGUMENT");
@@ -52,13 +52,13 @@ class GlobalExceptionHandlerTest {
 
     @Nested
     @DisplayName("IllegalStateException → 409")
-    class IllegalStateException {
+    class HandleIllegalState {
 
         @Test
         @DisplayName("should return 409 CONFLICT")
         void shouldReturnConflict() {
             ResponseEntity<ErrorResponse> resp = handler.handleIllegalState(
-                    new IllegalStateException("Already favorited"));
+                    new java.lang.IllegalStateException("Already favorited"));
 
             assertThat(resp.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
             assertThat(resp.getBody().errorCode()).isEqualTo("CONFLICT");
