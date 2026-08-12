@@ -1,21 +1,69 @@
 package com.neopick.adapter.web.config;
 
+import com.neopick.adapter.web.websocket.WebSocketAuthInterceptor;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.socket.config.annotation.EnableWebSocket;
-import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
-import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+import org.springframework.lang.NonNull;
+import org.springframework.messaging.simp.config.ChannelRegistration;
+import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
+import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
 
+/**
+ * STOMP-over-WebSocket configuration for real-time chat.
+ * Configures message broker, STOMP endpoints with SockJS fallback,
+ * and JWT authentication via channel interceptor.
+ */
 @Configuration
-@EnableWebSocket
-public class WebSocketConfig implements WebSocketConfigurer {
+@EnableWebSocketMessageBroker
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    @Override
-    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new ChatWebSocketHandler(), "/ws/chat")
-                .setAllowedOrigins("*");
+    private static final int MAX_MESSAGE_SIZE = 64 * 1024; // 64 KB
+    private static final int SEND_BUFFER_SIZE_LIMIT = 512 * 1024; // 512 KB
+
+    private final WebSocketAuthInterceptor authInterceptor;
+
+    public WebSocketConfig(WebSocketAuthInterceptor authInterceptor) {
+        this.authInterceptor = authInterceptor;
     }
 
-    private static class ChatWebSocketHandler
-            extends org.springframework.web.socket.handler.TextWebSocketHandler {
+    @Override
+    public void configureMessageBroker(@NonNull MessageBrokerRegistry config) {
+        // Enable a simple in-memory message broker for /topic (public) and /queue (user-specific)
+        config.enableSimpleBroker("/topic", "/queue");
+        // Application destination prefix: messages routed to @MessageMapping methods
+        config.setApplicationDestinationPrefixes("/app");
+        // User destination prefix: messages sent to /user/... are routed to specific users
+        config.setUserDestinationPrefix("/user");
+    }
+
+    @Override
+    public void registerStompEndpoints(@NonNull StompEndpointRegistry registry) {
+        registry.addEndpoint("/ws")
+                .setAllowedOriginPatterns("*")
+                .withSockJS();
+    }
+
+    @Override
+    public void configureWebSocketTransport(@NonNull WebSocketTransportRegistration registration) {
+        registration.setMessageSizeLimit(MAX_MESSAGE_SIZE);
+        registration.setSendBufferSizeLimit(SEND_BUFFER_SIZE_LIMIT);
+        registration.setSendTimeLimit(20 * 1000);
+    }
+
+    @Override
+    public void configureClientInboundChannel(@NonNull ChannelRegistration registration) {
+        registration.interceptors(authInterceptor);
+        registration.taskExecutor()
+                .corePoolSize(4)
+                .maxPoolSize(8);
+    }
+
+    @Override
+    public void configureClientOutboundChannel(@NonNull ChannelRegistration registration) {
+        registration.taskExecutor()
+                .corePoolSize(4)
+                .maxPoolSize(8);
     }
 }
