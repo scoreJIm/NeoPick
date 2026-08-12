@@ -6,6 +6,7 @@ import com.neopick.adapter.persistence.repository.BannerJpaRepository;
 import com.neopick.adapter.persistence.repository.CategoryJpaRepository;
 import com.neopick.domain.teacher.Teacher;
 import com.neopick.domain.teacher.TeacherRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class GetHomePageUseCase {
         this.teacherRepository = teacherRepository;
     }
 
+    @Cacheable(value = "homepage", key = "'home:' + #cityCode", unless = "#result == null")
     public HomePageResult execute(String cityCode) {
         List<BannerJpaEntity> banners = bannerRepo.findActiveByCity(cityCode);
         List<CategoryJpaEntity> categories = categoryRepo.findByActiveTrueOrderBySortOrderAsc();

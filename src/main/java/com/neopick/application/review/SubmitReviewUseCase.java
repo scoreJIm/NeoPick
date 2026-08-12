@@ -5,6 +5,7 @@ import com.neopick.domain.review.ReviewId;
 import com.neopick.domain.review.ReviewRepository;
 import com.neopick.infrastructure.metrics.BusinessMetrics;
 import com.neopick.port.security.SecurityContext;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +26,7 @@ public class SubmitReviewUseCase {
     }
 
     @Transactional
+    @CacheEvict(value = "teacherDetail", key = "#command.teacherId()")
     public Review execute(SubmitReviewCommand command) {
         if (reviewRepository.existsByBookingId(command.bookingId())) {
             throw new IllegalStateException("Review already exists for this booking");

@@ -3,6 +3,12 @@ spring:
     name: neopick-api
   profiles:
     active: dev
+  cache:
+    type: redis
+    redis:
+      time-to-live: 300000
+      cache-null-values: false
+      key-prefix: "neopick:cache:"
   jackson:
     property-naming-strategy: SNAKE_CASE
     serialization:

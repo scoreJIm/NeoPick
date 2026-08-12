@@ -1,6 +1,7 @@
 package com.neopick.application.city;
 
 import com.neopick.adapter.persistence.repository.CityJpaRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +16,7 @@ public class GetCitiesUseCase {
         this.cityJpaRepository = cityJpaRepository;
     }
 
+    @Cacheable(value = "cities", key = "'all'", unless = "#result.isEmpty()")
     public List<Map<String, Object>> allCities() {
         return cityJpaRepository.findAll().stream()
                 .map(c -> Map.<String, Object>of(
@@ -24,6 +26,7 @@ public class GetCitiesUseCase {
                 )).toList();
     }
 
+    @Cacheable(value = "cities", key = "'hot'", unless = "#result.isEmpty()")
     public List<Map<String, Object>> hotCities() {
         return cityJpaRepository.findByIsHotTrueOrderBySortOrderAsc().stream()
                 .map(c -> Map.<String, Object>of(
