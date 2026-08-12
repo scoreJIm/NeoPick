@@ -1,5 +1,7 @@
 package com.neopick.adapter.web.controller;
 
+import com.neopick.adapter.persistence.entity.CityJpaEntity;
+import com.neopick.adapter.persistence.repository.CityJpaRepository;
 import com.neopick.application.city.GetCitiesUseCase;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -11,7 +13,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
@@ -25,19 +26,20 @@ class CityControllerIT {
 
     @Autowired private MockMvc mockMvc;
 
-    @MockBean(name = "cityRepository")  // GetCitiesUseCase uses CityRepository port
-    private com.neopick.domain.teacher.CityRepository cityRepository;
+    @MockBean
+    private CityJpaRepository cityJpaRepository;
 
     @Nested
-    @DisplayName("GET /api/v1/cities — All cities")
+    @DisplayName("GET /api/v1/cities - All cities")
     class AllCities {
 
         @Test
         @DisplayName("should return all cities")
         void shouldReturnAllCities() throws Exception {
-            when(cityRepository.findAll()).thenReturn(List.of(
-                    Map.of("code", "SH", "name", "Shanghai"),
-                    Map.of("code", "BJ", "name", "Beijing")));
+            CityJpaEntity shanghai = buildCity("SH", "Shanghai", 1, true);
+            CityJpaEntity beijing = buildCity("BJ", "Beijing", 2, true);
+
+            when(cityJpaRepository.findAll()).thenReturn(List.of(shanghai, beijing));
 
             mockMvc.perform(get("/api/v1/cities"))
                     .andExpect(status().isOk())
@@ -48,18 +50,29 @@ class CityControllerIT {
     }
 
     @Nested
-    @DisplayName("GET /api/v1/cities/hot — Hot cities")
+    @DisplayName("GET /api/v1/cities/hot - Hot cities")
     class HotCities {
 
         @Test
         @DisplayName("should return hot cities")
         void shouldReturnHotCities() throws Exception {
-            when(cityRepository.findHot()).thenReturn(List.of(
-                    Map.of("code", "SH", "name", "Shanghai")));
+            CityJpaEntity shanghai = buildCity("SH", "Shanghai", 1, true);
+
+            when(cityJpaRepository.findByIsHotTrueOrderBySortOrderAsc())
+                    .thenReturn(List.of(shanghai));
 
             mockMvc.perform(get("/api/v1/cities/hot"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.data", hasSize(1)));
         }
+    }
+
+    private CityJpaEntity buildCity(String code, String name, int sortOrder, boolean hot) {
+        CityJpaEntity entity = new CityJpaEntity();
+        entity.setCode(code);
+        entity.setName(name);
+        entity.setSortOrder(sortOrder);
+        entity.setHot(hot);
+        return entity;
     }
 }

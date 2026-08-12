@@ -58,6 +58,38 @@ springdoc:
   api-docs:
     path: /v3/api-docs
 
+resilience4j:
+  circuitbreaker:
+    instances:
+      smsService:
+        sliding-window-size: 10
+        minimum-number-of-calls: 3
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 30s
+        permitted-number-of-calls-in-half-open-state: 3
+      paymentGateway:
+        sliding-window-size: 10
+        minimum-number-of-calls: 3
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 30s
+        permitted-number-of-calls-in-half-open-state: 3
+      s3Storage:
+        sliding-window-size: 10
+        minimum-number-of-calls: 3
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 30s
+        permitted-number-of-calls-in-half-open-state: 3
+  retry:
+    instances:
+      s3Storage:
+        max-attempts: 3
+        wait-duration: 2s
+        exponential-backoff-multiplier: 2
+  timelimiter:
+    instances:
+      paymentGateway:
+        timeout-duration: 15s
+
 neopick:
   jwt:
     access-token-expiration: 2h

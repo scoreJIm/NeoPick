@@ -1,9 +1,14 @@
 package com.neopick.adapter.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.neopick.BaseIntegrationTest;
 import com.neopick.domain.booking.BookingRepository;
 import com.neopick.domain.booking.BookingStatus;
-import com.neopick.domain.user.*;
+import com.neopick.domain.user.PhoneNumber;
+import com.neopick.domain.user.User;
+import com.neopick.domain.user.UserId;
+import com.neopick.domain.user.UserRepository;
+import com.neopick.domain.user.UserRole;
 import com.neopick.port.security.SecurityContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,24 +17,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
-@Transactional
-@DisplayName("Booking E2E — H2 (no Docker)")
-class BookingH2E2ETest {
+@DisplayName("Booking E2E — PostgreSQL (Testcontainers)")
+class BookingH2E2ETest extends BaseIntegrationTest {
 
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
@@ -43,7 +48,7 @@ class BookingH2E2ETest {
     @BeforeEach
     void setUp() {
         User student = new User(UserId.generate(), PhoneNumber.of("13800138003"),
-                "H2Tester", UserRole.STUDENT);
+                "PGTester", UserRole.STUDENT);
         User saved = userRepository.save(student);
         studentId = saved.getId().value().toString();
 
@@ -52,13 +57,13 @@ class BookingH2E2ETest {
     }
 
     @Test
-    @DisplayName("Submit → persist → verify persisted state")
-    void shouldPersistBookingToH2() throws Exception {
+    @DisplayName("Submit -> persist -> verify persisted state")
+    void shouldPersistBooking() throws Exception {
         String scheduleTime = LocalDateTime.now().plusDays(3).withHour(14).withMinute(0)
                 .withSecond(0).withNano(0).toString();
 
         String response = mockMvc.perform(post("/api/v1/bookings")
-                        .contentType("application/json")
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content(bookingBody(scheduleTime)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.status").value("PENDING_CONFIRM"))
@@ -75,20 +80,20 @@ class BookingH2E2ETest {
     }
 
     @Test
-    @DisplayName("Submit → confirm → complete → verify each state persisted")
+    @DisplayName("Submit -> confirm -> complete -> verify each state persisted")
     void fullLifecycleWithDbVerification() throws Exception {
         String scheduleTime = LocalDateTime.now().plusDays(3).withHour(14).withMinute(0)
                 .withSecond(0).withNano(0).toString();
 
         String response = mockMvc.perform(post("/api/v1/bookings")
-                        .contentType("application/json")
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content(bookingBody(scheduleTime)))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
         String bookingId = objectMapper.readTree(response).get("data").get("id").asText();
 
-        // Confirm → verify DB
+        // Confirm -> verify DB
         mockMvc.perform(put("/api/v1/bookings/{id}/confirm", bookingId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.status").value("PENDING_PAY"));
@@ -98,7 +103,7 @@ class BookingH2E2ETest {
         assertThat(afterConfirm).isPresent();
         assertThat(afterConfirm.get().getStatus()).isEqualTo(BookingStatus.PENDING_PAY);
 
-        // Pay + Complete → verify DB
+        // Pay + Complete -> verify DB
         afterConfirm.get().pay();
         bookingRepository.save(afterConfirm.get());
 
@@ -119,8 +124,8 @@ class BookingH2E2ETest {
                     "scheduled_start": "%s",
                     "duration_minutes": 60,
                     "price": 300.00,
-                    "address_label": "H2 Studio",
-                    "address_detail": "Test Room",
+                    "address_label": "PG Studio",
+                    "address_detail": "Integration Test Room",
                     "latitude": 31.2304,
                     "longitude": 121.4737
                 }""".formatted(scheduleTime);

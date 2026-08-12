@@ -1,6 +1,7 @@
 package com.neopick.adapter.sms;
 
 import com.neopick.port.sms.SmsSender;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -17,6 +18,7 @@ public class MockSmsSender implements SmsSender {
     private final Map<String, String> codeStore = new ConcurrentHashMap<>();
 
     @Override
+    @CircuitBreaker(name = "smsService", fallbackMethod = "sendFallback")
     public void sendVerificationCode(String phone, String code) {
         codeStore.put(phone, code);
         log.info("[MOCK SMS] Sending code {} to phone {}", code, phone);
@@ -31,5 +33,10 @@ public class MockSmsSender implements SmsSender {
         }
         log.info("[MOCK SMS] Code verification for {} : {}", phone, valid ? "PASS" : "FAIL");
         return valid;
+    }
+
+    @SuppressWarnings("unused")
+    void sendFallback(String phone, String code, Throwable t) {
+        log.error("[MOCK SMS] Circuit breaker open — SMS not sent to {}", phone, t);
     }
 }

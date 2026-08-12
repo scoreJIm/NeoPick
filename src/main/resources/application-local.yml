@@ -37,6 +37,16 @@ neopick:
       bucket: neopick-local-media
     sns:
       booking-events-topic: arn:aws:sns:us-east-1:000000000000:neopick-local-booking-events
+  s3:
+    bucket: neopick-local-media
+    region: us-east-1
+    presign-upload-duration: 300
+    presign-download-duration: 3600
+  cdn:
+    domain: https://cdn.neopick.local
+  media:
+    max-file-size: 5242880
+    allowed-types: image/jpeg,image/png,image/webp
 
 logging:
   level:
