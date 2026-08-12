@@ -1,9 +1,15 @@
 package com.neopick.adapter.web.dto.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record ApiResponse<T>(int code, String message, T data) {
+@Schema(description = "Standard API response envelope")
+public record ApiResponse<T>(
+        @Schema(description = "HTTP status code", example = "200") int code,
+        @Schema(description = "Response message", example = "OK") String message,
+        @Schema(description = "Response payload data") T data
+) {
 
     public static <T> ApiResponse<T> success(T data) {
         return new ApiResponse<>(200, "OK", data);

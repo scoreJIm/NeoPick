@@ -50,6 +50,14 @@ management:
       endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318/v1/traces}
       transport: http
 
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: method
+  api-docs:
+    path: /v3/api-docs
+
 neopick:
   jwt:
     access-token-expiration: 2h
@@ -62,3 +70,26 @@ neopick:
   booking:
     pending-confirm-timeout: 24h
     pending-pay-timeout: 2h
+  s3:
+    bucket: ${S3_BUCKET:neopick-dev}
+    region: ${AWS_REGION:us-east-1}
+    presign-upload-duration: 300
+    presign-download-duration: 3600
+  cdn:
+    domain: ${CDN_DOMAIN:https://cdn.neopick.com}
+  media:
+    max-file-size: 5242880
+    allowed-types: image/jpeg,image/png,image/webp
+  payment:
+    alipay:
+      app-id: ${ALIPAY_APP_ID:}
+      private-key: ${ALIPAY_PRIVATE_KEY:}
+      alipay-public-key: ${ALIPAY_PUBLIC_KEY:}
+      gateway-url: ${ALIPAY_GATEWAY:https://openapi-sandbox.dl.alipaydev.com/gateway.do}
+      notify-url: ${ALIPAY_NOTIFY_URL:https://api.neopick.com/api/v1/payments/callback/alipay}
+      return-url: ${ALIPAY_RETURN_URL:https://neopick.com/payment/result}
+    wechat:
+      app-id: ${WECHAT_APP_ID:}
+      mch-id: ${WECHAT_MCH_ID:}
+      api-key: ${WECHAT_API_KEY:}
+      notify-url: ${WECHAT_NOTIFY_URL:}

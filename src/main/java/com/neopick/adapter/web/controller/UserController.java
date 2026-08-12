@@ -8,10 +8,18 @@ import com.neopick.application.user.UpdateProfileUseCase;
 import com.neopick.application.user.UpdateProfileUseCase.UpdateProfileCommand;
 import com.neopick.domain.user.User;
 import io.micrometer.core.annotation.Timed;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/users")
+@Tag(name = "Users", description = "Current user profile management")
+@SecurityRequirement(name = "bearerAuth")
 public class UserController {
 
     private final GetCurrentUserUseCase getCurrentUserUseCase;
@@ -25,6 +33,11 @@ public class UserController {
 
     @GetMapping("/me")
     @Timed(value = "neopick.users.get_me", description = "Get current user profile")
+    @Operation(summary = "Get current user profile", description = "Returns the authenticated user's profile information including nickname, avatar, gender, and membership status.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "User profile retrieved successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Not authenticated", content = @Content)
+    })
     public ApiResponse<UserResponse> getCurrentUser() {
         User user = getCurrentUserUseCase.execute();
         return ApiResponse.success(toResponse(user));
@@ -32,6 +45,12 @@ public class UserController {
 
     @PutMapping("/me")
     @Timed(value = "neopick.users.update_profile", description = "Update user profile")
+    @Operation(summary = "Update user profile", description = "Updates the authenticated user's nickname, gender, and avatar URL.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Profile updated successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid request body", content = @Content),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Not authenticated", content = @Content)
+    })
     public ApiResponse<UserResponse> updateProfile(@RequestBody UpdateProfileRequest request) {
         User user = updateProfileUseCase.execute(
                 new UpdateProfileCommand(request.nickname(), request.gender(), request.avatarUrl()));
