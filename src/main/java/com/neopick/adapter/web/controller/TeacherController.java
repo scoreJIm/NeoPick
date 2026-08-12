@@ -5,6 +5,7 @@ import com.neopick.adapter.web.dto.common.PageResponse;
 import com.neopick.adapter.web.dto.teacher.TeacherCardResponse;
 import com.neopick.application.teacher.*;
 import com.neopick.shared.Constants;
+import io.micrometer.core.annotation.Timed;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,6 +33,7 @@ public class TeacherController {
     }
 
     @GetMapping
+    @Timed(value = "neopick.teachers.search", description = "Search teachers")
     public ApiResponse<PageResponse<TeacherCardResponse>> search(
             @RequestParam(required = false) String city,
             @RequestParam(required = false) Long category,
@@ -54,12 +56,14 @@ public class TeacherController {
     }
 
     @GetMapping("/{id}")
+    @Timed(value = "neopick.teachers.get_by_id", description = "Get teacher detail")
     public ApiResponse<TeacherCardResponse> getById(@PathVariable Long id) {
         var teacher = getTeacherDetailUseCase.execute(id);
         return ApiResponse.success(TeacherCardResponse.from(teacher));
     }
 
     @GetMapping("/featured")
+    @Timed(value = "neopick.teachers.featured", description = "Get featured teachers")
     public ApiResponse<List<TeacherCardResponse>> featured(
             @RequestParam String city,
             @RequestParam(defaultValue = "6") int limit) {
@@ -68,6 +72,7 @@ public class TeacherController {
     }
 
     @GetMapping("/popular")
+    @Timed(value = "neopick.teachers.popular", description = "Get popular teachers")
     public ApiResponse<List<TeacherCardResponse>> popular(
             @RequestParam String city,
             @RequestParam(defaultValue = "6") int limit) {
@@ -76,6 +81,7 @@ public class TeacherController {
     }
 
     @GetMapping("/weekly-recommendations")
+    @Timed(value = "neopick.teachers.weekly_recommendations", description = "Get weekly recommendations")
     public ApiResponse<List<TeacherCardResponse>> weeklyRecommendations(
             @RequestParam String city,
             @RequestParam(defaultValue = "10") int limit) {

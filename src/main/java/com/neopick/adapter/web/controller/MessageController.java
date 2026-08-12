@@ -6,6 +6,7 @@ import com.neopick.adapter.web.dto.message.MessageResponse;
 import com.neopick.adapter.web.dto.message.SendMessageRequest;
 import com.neopick.adapter.web.dto.message.StartConversationRequest;
 import com.neopick.application.message.MessageUseCase;
+import io.micrometer.core.annotation.Timed;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,12 +23,14 @@ public class MessageController {
     }
 
     @GetMapping("/conversations")
+    @Timed(value = "neopick.messages.list_conversations", description = "List conversations")
     public ApiResponse<List<ConversationResponse>> listConversations() {
         var convs = messageUseCase.listConversations();
         return ApiResponse.success(convs.stream().map(ConversationResponse::from).toList());
     }
 
     @PostMapping("/conversations")
+    @Timed(value = "neopick.messages.start_conversation", description = "Start conversation")
     public ApiResponse<ConversationResponse> startConversation(
             @Valid @RequestBody StartConversationRequest request) {
         var conv = messageUseCase.startConversation(request.teacherId());
@@ -35,6 +38,7 @@ public class MessageController {
     }
 
     @GetMapping("/conversations/{id}/messages")
+    @Timed(value = "neopick.messages.get_messages", description = "Get conversation messages")
     public ApiResponse<List<MessageResponse>> getMessages(
             @PathVariable String id,
             @RequestParam(defaultValue = "0") int page,
@@ -44,6 +48,7 @@ public class MessageController {
     }
 
     @PostMapping("/conversations/{id}/messages")
+    @Timed(value = "neopick.messages.send", description = "Send message")
     public ApiResponse<MessageResponse> sendMessage(
             @PathVariable String id,
             @Valid @RequestBody SendMessageRequest request) {

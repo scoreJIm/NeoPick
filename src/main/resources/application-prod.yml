@@ -38,7 +38,43 @@ neopick:
     sns:
       booking-events-topic: ${SNS_BOOKING_EVENTS_TOPIC_ARN}
 
-  logging:
-    level:
-      com.neopick: INFO
-      org.springframework.web: WARN
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+    prometheus:
+      enabled: true
+  metrics:
+    tags:
+      application: neopick-api
+      environment: prod
+    export:
+      prometheus:
+        enabled: true
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+      slo:
+        http:
+          server:
+            requests: 50ms, 100ms, 200ms, 500ms, 1s, 2s
+  tracing:
+    sampling:
+      probability: 0.1
+  otlp:
+    tracing:
+      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT}
+      transport: http
+
+logging:
+  level:
+    com.neopick: INFO
+    org.springframework.web: WARN

@@ -5,6 +5,7 @@ import com.neopick.adapter.web.dto.review.ReviewResponse;
 import com.neopick.adapter.web.dto.review.SubmitReviewRequest;
 import com.neopick.application.review.GetMyReviewsUseCase;
 import com.neopick.application.review.SubmitReviewUseCase;
+import io.micrometer.core.annotation.Timed;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +25,7 @@ public class ReviewController {
     }
 
     @PostMapping
+    @Timed(value = "neopick.reviews.submit", description = "Submit review")
     public ApiResponse<ReviewResponse> submit(@Valid @RequestBody SubmitReviewRequest request) {
         var review = submitReviewUseCase.execute(new SubmitReviewUseCase.SubmitReviewCommand(
                 request.bookingId(), request.teacherId(), request.rating(),
@@ -32,6 +34,7 @@ public class ReviewController {
     }
 
     @GetMapping("/my")
+    @Timed(value = "neopick.reviews.my", description = "Get my reviews")
     public ApiResponse<List<ReviewResponse>> myReviews(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {

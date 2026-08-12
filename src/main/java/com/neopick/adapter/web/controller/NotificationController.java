@@ -3,6 +3,7 @@ package com.neopick.adapter.web.controller;
 import com.neopick.adapter.web.dto.common.ApiResponse;
 import com.neopick.adapter.web.dto.notification.NotificationResponse;
 import com.neopick.application.notification.NotificationUseCase;
+import io.micrometer.core.annotation.Timed;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class NotificationController {
     }
 
     @GetMapping
+    @Timed(value = "neopick.notifications.list", description = "List notifications")
     public ApiResponse<List<NotificationResponse>> list(
             @RequestParam(required = false) String type,
             @RequestParam(defaultValue = "0") int page,
@@ -28,18 +30,21 @@ public class NotificationController {
     }
 
     @PutMapping("/{id}/read")
+    @Timed(value = "neopick.notifications.mark_read", description = "Mark notification as read")
     public ApiResponse<Void> markAsRead(@PathVariable String id) {
         notificationUseCase.markAsRead(id);
         return ApiResponse.success();
     }
 
     @PutMapping("/read-all")
+    @Timed(value = "neopick.notifications.mark_all_read", description = "Mark all notifications as read")
     public ApiResponse<Void> markAllAsRead() {
         notificationUseCase.markAllAsRead();
         return ApiResponse.success();
     }
 
     @GetMapping("/unread-count")
+    @Timed(value = "neopick.notifications.unread_count", description = "Get unread notification count")
     public ApiResponse<Map<String, Long>> unreadCount() {
         return ApiResponse.success(Map.of("count", notificationUseCase.unreadCount()));
     }

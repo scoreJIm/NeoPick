@@ -4,6 +4,7 @@ import com.neopick.adapter.web.dto.common.ApiResponse;
 import com.neopick.adapter.web.dto.homepage.HomePageResponse;
 import com.neopick.adapter.web.dto.teacher.TeacherCardResponse;
 import com.neopick.application.homepage.GetHomePageUseCase;
+import io.micrometer.core.annotation.Timed;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class HomeController {
     }
 
     @GetMapping
+    @Timed(value = "neopick.home.get", description = "Get home page")
     public ApiResponse<HomePageResponse> home(@RequestParam(defaultValue = "SH") String city) {
         var result = getHomePageUseCase.execute(city);
         return ApiResponse.success(new HomePageResponse(

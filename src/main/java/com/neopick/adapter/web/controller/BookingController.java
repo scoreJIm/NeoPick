@@ -44,6 +44,7 @@ public class BookingController {
     }
 
     @GetMapping
+    @Timed(value = "neopick.bookings.list_student", description = "List student bookings")
     public ApiResponse<PageResponse<BookingResponse>> listStudent(
             @RequestParam(required = false) String status,
             @RequestParam(defaultValue = "0") int page,
@@ -55,6 +56,7 @@ public class BookingController {
     }
 
     @GetMapping("/{id}")
+    @Timed(value = "neopick.bookings.get_by_id", description = "Get booking detail")
     public ApiResponse<BookingResponse> getById(@PathVariable String id) {
         Booking booking = manageBookingUseCase.getDetail(id);
         return ApiResponse.success(BookingResponse.from(booking));
@@ -68,6 +70,7 @@ public class BookingController {
     }
 
     @PutMapping("/{id}/reject")
+    @Timed(value = "neopick.bookings.reject", description = "Reject booking")
     public ApiResponse<BookingResponse> reject(@PathVariable String id,
                                                 @RequestBody CancelBookingRequest request) {
         Booking booking = manageBookingUseCase.reject(id, request.reason());
@@ -75,6 +78,7 @@ public class BookingController {
     }
 
     @PutMapping("/{id}/cancel")
+    @Timed(value = "neopick.bookings.cancel", description = "Cancel booking")
     public ApiResponse<BookingResponse> cancel(@PathVariable String id,
                                                 @RequestBody CancelBookingRequest request) {
         Booking booking = manageBookingUseCase.cancel(id, request.reason());
@@ -89,6 +93,7 @@ public class BookingController {
     }
 
     @GetMapping("/teacher")
+    @Timed(value = "neopick.bookings.list_teacher", description = "List teacher bookings")
     public ApiResponse<PageResponse<BookingResponse>> listTeacher(
             @RequestParam Long teacherId,
             @RequestParam(required = false) String status,

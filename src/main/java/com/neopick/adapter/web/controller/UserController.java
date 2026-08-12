@@ -7,6 +7,7 @@ import com.neopick.application.user.GetCurrentUserUseCase;
 import com.neopick.application.user.UpdateProfileUseCase;
 import com.neopick.application.user.UpdateProfileUseCase.UpdateProfileCommand;
 import com.neopick.domain.user.User;
+import io.micrometer.core.annotation.Timed;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,12 +24,14 @@ public class UserController {
     }
 
     @GetMapping("/me")
+    @Timed(value = "neopick.users.get_me", description = "Get current user profile")
     public ApiResponse<UserResponse> getCurrentUser() {
         User user = getCurrentUserUseCase.execute();
         return ApiResponse.success(toResponse(user));
     }
 
     @PutMapping("/me")
+    @Timed(value = "neopick.users.update_profile", description = "Update user profile")
     public ApiResponse<UserResponse> updateProfile(@RequestBody UpdateProfileRequest request) {
         User user = updateProfileUseCase.execute(
                 new UpdateProfileCommand(request.nickname(), request.gender(), request.avatarUrl()));
