@@ -1,14 +1,18 @@
 package com.neopick.application.auth;
 
-import com.neopick.domain.auth.AuthService;
 import com.neopick.domain.auth.SmsCodeService;
 import com.neopick.domain.auth.TokenPair;
 import com.neopick.domain.user.User;
 import com.neopick.domain.user.UserRepository;
 import com.neopick.infrastructure.metrics.BusinessMetrics;
+import com.neopick.port.security.RefreshTokenRepository;
 import com.neopick.port.security.TokenProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.UUID;
 
 @Service
 public class LoginUseCase {
@@ -16,13 +20,17 @@ public class LoginUseCase {
     private final SmsCodeService smsCodeService;
     private final UserRepository userRepository;
     private final TokenProvider tokenProvider;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final BusinessMetrics metrics;
 
     public LoginUseCase(SmsCodeService smsCodeService, UserRepository userRepository,
-                        TokenProvider tokenProvider, BusinessMetrics metrics) {
+                        TokenProvider tokenProvider,
+                        RefreshTokenRepository refreshTokenRepository,
+                        BusinessMetrics metrics) {
         this.smsCodeService = smsCodeService;
         this.userRepository = userRepository;
         this.tokenProvider = tokenProvider;
+        this.refreshTokenRepository = refreshTokenRepository;
         this.metrics = metrics;
     }
 
@@ -36,10 +44,17 @@ public class LoginUseCase {
                 .orElseGet(() -> registerNewUser(command.phone()));
         user.recordLogin();
         userRepository.save(user);
-        String accessToken = tokenProvider.generateAccessToken(
-                user.getId().value().toString(), user.getRole().name());
-        String refreshToken = tokenProvider.generateRefreshToken(
-                user.getId().value().toString());
+
+        String userId = user.getId().value().toString();
+        String accessToken = tokenProvider.generateAccessToken(userId, user.getRole().name());
+        String refreshToken = tokenProvider.generateRefreshToken(userId);
+
+        String tokenHash = tokenProvider.hashToken(refreshToken);
+        String familyId = UUID.randomUUID().toString();
+        LocalDateTime expiresAt = LocalDateTime.ofInstant(
+                tokenProvider.getExpirationFromToken(refreshToken), ZoneId.systemDefault());
+        refreshTokenRepository.save(user.getId().value(), tokenHash, familyId, expiresAt);
+
         TokenPair tokens = new TokenPair(accessToken, refreshToken);
         return new LoginResult(user, tokens);
     }

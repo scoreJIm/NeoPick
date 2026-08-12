@@ -2,6 +2,9 @@ package com.neopick.adapter.web.exception;
 
 import com.neopick.adapter.web.dto.common.ApiResponse;
 import com.neopick.adapter.web.dto.common.ErrorResponse;
+import com.neopick.application.auth.RefreshTokenUseCase.TokenExpiredException;
+import com.neopick.application.auth.RefreshTokenUseCase.TokenReuseDetectedException;
+import com.neopick.application.auth.RefreshTokenUseCase.TokenRevokedException;
 import com.neopick.domain.common.BusinessException;
 import com.neopick.domain.media.FileTooLargeException;
 import com.neopick.domain.media.UnsupportedFileTypeException;
@@ -76,6 +79,27 @@ public class GlobalExceptionHandler {
         log.warn("File too large: {} bytes (max: {} bytes)", ex.getFileSize(), ex.getMaxSize());
         return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
                 .body(ErrorResponse.of(413, ex.getMessage(), "FILE_TOO_LARGE"));
+    }
+
+    @ExceptionHandler(TokenExpiredException.class)
+    public ResponseEntity<ErrorResponse> handleTokenExpired(TokenExpiredException ex) {
+        log.warn("Token expired: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ErrorResponse.of(401, ex.getMessage(), "TOKEN_EXPIRED"));
+    }
+
+    @ExceptionHandler(TokenRevokedException.class)
+    public ResponseEntity<ErrorResponse> handleTokenRevoked(TokenRevokedException ex) {
+        log.warn("Token revoked: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ErrorResponse.of(401, ex.getMessage(), "TOKEN_REVOKED"));
+    }
+
+    @ExceptionHandler(TokenReuseDetectedException.class)
+    public ResponseEntity<ErrorResponse> handleTokenReuseDetected(TokenReuseDetectedException ex) {
+        log.warn("Token reuse detected: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ErrorResponse.of(401, ex.getMessage(), "TOKEN_REUSE_DETECTED"));
     }
 
     @ExceptionHandler(Exception.class)

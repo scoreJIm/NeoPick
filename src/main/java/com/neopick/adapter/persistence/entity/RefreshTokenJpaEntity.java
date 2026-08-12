@@ -21,8 +21,17 @@ public class RefreshTokenJpaEntity {
     @Column(name = "expires_at", nullable = false)
     private LocalDateTime expiresAt;
 
+    @Column(name = "family_id", length = 36)
+    private String familyId;
+
     @Column(name = "revoked", nullable = false)
     private boolean revoked;
+
+    @Column(name = "replaced_by_token", length = 128)
+    private String replacedByToken;
+
+    @Column(name = "revoked_at")
+    private LocalDateTime revokedAt;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -68,6 +77,30 @@ public class RefreshTokenJpaEntity {
 
     public void setRevoked(boolean revoked) {
         this.revoked = revoked;
+    }
+
+    public String getFamilyId() {
+        return familyId;
+    }
+
+    public void setFamilyId(String familyId) {
+        this.familyId = familyId;
+    }
+
+    public String getReplacedByToken() {
+        return replacedByToken;
+    }
+
+    public void setReplacedByToken(String replacedByToken) {
+        this.replacedByToken = replacedByToken;
+    }
+
+    public LocalDateTime getRevokedAt() {
+        return revokedAt;
+    }
+
+    public void setRevokedAt(LocalDateTime revokedAt) {
+        this.revokedAt = revokedAt;
     }
 
     public LocalDateTime getCreatedAt() {

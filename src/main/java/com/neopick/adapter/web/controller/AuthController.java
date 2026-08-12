@@ -6,6 +6,7 @@ import com.neopick.application.auth.LoginUseCase;
 import com.neopick.application.auth.LoginUseCase.LoginCommand;
 import com.neopick.application.auth.LoginUseCase.LoginResult;
 import com.neopick.application.auth.RefreshTokenUseCase;
+import com.neopick.application.auth.RefreshTokenUseCase.LogoutCommand;
 import com.neopick.application.auth.RefreshTokenUseCase.RefreshTokenCommand;
 import com.neopick.application.auth.SendSmsCodeUseCase;
 import com.neopick.application.auth.SendSmsCodeUseCase.SendSmsCodeCommand;
@@ -13,7 +14,6 @@ import com.neopick.infrastructure.ratelimit.RateLimit;
 import io.micrometer.core.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -45,7 +45,7 @@ public class AuthController {
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "SMS code sent successfully"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid phone number format", content = @Content),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "429", description = "Too many requests — rate limit exceeded", content = @Content)
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "429", description = "Too many requests -- rate limit exceeded", content = @Content)
     })
     public ApiResponse<Void> sendSmsCode(@Valid @RequestBody SendSmsRequest request) {
         sendSmsCodeUseCase.execute(new SendSmsCodeCommand(request.phone()));
@@ -58,7 +58,7 @@ public class AuthController {
     @Timed(value = "neopick.auth.login", description = "User login")
     @Operation(summary = "Login with phone and SMS code", description = "Authenticates a user using phone number and SMS verification code. Returns JWT access and refresh tokens.")
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Login successful — returns tokens and user profile"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Login successful -- returns tokens and user profile"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid phone number or verification code", content = @Content),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Invalid or expired verification code", content = @Content),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "429", description = "Too many login attempts", content = @Content)
@@ -84,16 +84,15 @@ public class AuthController {
     @ResponseStatus(HttpStatus.OK)
     @RateLimit(limit = 30, windowSeconds = 60, scope = "IP")
     @Timed(value = "neopick.auth.refresh", description = "Refresh access token")
-    @Operation(summary = "Refresh access token", description = "Exchanges a valid refresh token for a new access token and refresh token pair.")
+    @Operation(summary = "Refresh access token", description = "Exchanges a valid refresh token for a new access token and refresh token pair. Old refresh token is invalidated (token rotation).")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Token refreshed successfully"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Missing or invalid refresh token", content = @Content),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Expired or revoked refresh token", content = @Content)
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Expired, revoked, or reused refresh token", content = @Content)
     })
     public ApiResponse<LoginResponse> refresh(@Valid @RequestBody RefreshTokenRequest request) {
         var tokens = refreshTokenUseCase.execute(new RefreshTokenCommand(request.refreshToken()));
-        LoginResponse response = new LoginResponse(
-                tokens.accessToken(), tokens.refreshToken(), null);
+        LoginResponse response = new LoginResponse(tokens.accessToken(), tokens.refreshToken(), null);
         return ApiResponse.success(response);
     }
 
@@ -101,12 +100,13 @@ public class AuthController {
     @ResponseStatus(HttpStatus.OK)
     @RateLimit(limit = 10, windowSeconds = 60, scope = "IP")
     @Timed(value = "neopick.auth.logout", description = "User logout")
-    @Operation(summary = "Logout", description = "Invalidates the current user session and refresh token.")
+    @Operation(summary = "Logout", description = "Revokes the current refresh token and invalidates the session.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Logged out successfully"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Not authenticated", content = @Content)
     })
-    public ApiResponse<Void> logout() {
+    public ApiResponse<Void> logout(@Valid @RequestBody LogoutRequest request) {
+        refreshTokenUseCase.logout(new LogoutCommand(request.refreshToken()));
         return ApiResponse.success();
     }
 }
