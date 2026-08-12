@@ -24,7 +24,7 @@
         <lombok.version>1.18.36</lombok.version>
         <testcontainers.version>1.20.4</testcontainers.version>
         <aws-sdk.version>2.29.16</aws-sdk.version>
-        <springdoc.version>2.7.0</springdoc.version>
+        <springdoc.version>2.6.0</springdoc.version>
         <jacoco.version>0.8.12</jacoco.version>
         <checkstyle.version>3.1.2</checkstyle.version>
         <resilience4j.version>2.2.0</resilience4j.version>
