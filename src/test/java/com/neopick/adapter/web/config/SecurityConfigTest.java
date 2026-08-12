@@ -37,7 +37,7 @@ class SecurityConfigTest {
         void sendSmsShouldBePublic() throws Exception {
             mockMvc.perform(post("/api/v1/auth/send-sms-code")
                             .contentType("application/json")
-                            .content("{\"phone\": \"13800138000\"}"))
+                            .content("{\"phone\": \"+8613800138000\"}"))
                     .andExpect(status().isOk());
         }
 
@@ -46,7 +46,7 @@ class SecurityConfigTest {
         void loginShouldBePublic() throws Exception {
             mockMvc.perform(post("/api/v1/auth/login")
                             .contentType("application/json")
-                            .content("{\"phone\": \"13800138000\", \"code\": \"123456\"}"))
+                            .content("{\"phone\": \"+8613800138000\", \"code\": \"123456\"}"))
                     .andExpect(status().isBadRequest()); // bad request = passed security
         }
 

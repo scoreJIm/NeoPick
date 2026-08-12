@@ -28,7 +28,7 @@ public class GetCitiesUseCase {
 
     @Cacheable(value = "cities", key = "'hot'", unless = "#result.isEmpty()")
     public List<Map<String, Object>> hotCities() {
-        return cityJpaRepository.findByIsHotTrueOrderBySortOrderAsc().stream()
+        return cityJpaRepository.findByHotTrueOrderBySortOrderAsc().stream()
                 .map(c -> Map.<String, Object>of(
                         "code", c.getCode(),
                         "name", c.getName()

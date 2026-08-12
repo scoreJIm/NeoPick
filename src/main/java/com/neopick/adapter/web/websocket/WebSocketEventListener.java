@@ -3,6 +3,7 @@ package com.neopick.adapter.web.websocket;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -23,6 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * validates subscription destinations, and exposes metrics.
  */
 @Component
+@ConditionalOnBean(SimpMessagingTemplate.class)
 public class WebSocketEventListener {
 
     private static final Logger log = LoggerFactory.getLogger(WebSocketEventListener.class);

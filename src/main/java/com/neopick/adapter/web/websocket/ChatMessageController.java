@@ -6,6 +6,7 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -23,6 +24,7 @@ import java.util.Map;
  * Uses {@code @MessageMapping} to route STOMP SEND frames to handler methods.
  */
 @Controller
+@ConditionalOnBean(SimpMessagingTemplate.class)
 public class ChatMessageController {
 
     private static final Logger log = LoggerFactory.getLogger(ChatMessageController.class);

@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-@Profile("dev")
+@Profile({"dev", "test", "local"})
 public class MockSmsSender implements SmsSender {
 
     private static final Logger log = LoggerFactory.getLogger(MockSmsSender.class);

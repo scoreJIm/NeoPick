@@ -1,6 +1,7 @@
 package com.neopick.adapter.cache;
 
 import com.neopick.port.cache.CacheManager;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -9,6 +10,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Component
+@ConditionalOnBean(StringRedisTemplate.class)
 public class RedisCacheManager implements CacheManager {
 
     private final StringRedisTemplate redisTemplate;

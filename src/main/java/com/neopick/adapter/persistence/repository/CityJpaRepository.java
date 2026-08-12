@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface CityJpaRepository extends JpaRepository<CityJpaEntity, String> {
 
-    List<CityJpaEntity> findByIsHotTrueOrderBySortOrderAsc();
+    List<CityJpaEntity> findByHotTrueOrderBySortOrderAsc();
 }

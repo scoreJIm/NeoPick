@@ -27,7 +27,7 @@ public class ReviewJpaEntity {
     @Column(name = "content")
     private String content;
 
-    @Column(name = "tags", columnDefinition = "text[]")
+    @Column(name = "tags", columnDefinition = "TEXT ARRAY")
     private String tags;
 
     @Column(name = "created_at", nullable = false)

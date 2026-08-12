@@ -29,7 +29,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
-            if (tokenProvider.validateToken(token)) {
+            if (!token.isBlank() && tokenProvider.validateToken(token)) {
                 String userId = tokenProvider.getUserIdFromToken(token);
                 String role = tokenProvider.getRoleFromToken(token);
                 securityContextHolder.setAuthentication(userId, role);

@@ -17,8 +17,8 @@ class PhoneNumberTest {
     class ValidPhoneNumbers {
 
         @ParameterizedTest
-        @ValueSource(strings = {"13800138000", "15912345678", "18888888888", "13600001111"})
-        @DisplayName("should accept valid 11-digit China mobile numbers")
+        @ValueSource(strings = {"+8613800138000", "+8615912345678", "+8618888888888", "+8613600001111"})
+        @DisplayName("should accept valid +86 prefixed China mobile numbers")
         void shouldAcceptValidNumbers(String number) {
             PhoneNumber phone = PhoneNumber.of(number);
             assertThat(phone.value()).isEqualTo(number);
@@ -46,16 +46,16 @@ class PhoneNumberTest {
         @Test
         @DisplayName("should mask middle 4 digits")
         void shouldMaskPhoneNumber() {
-            PhoneNumber phone = PhoneNumber.of("13800138000");
-            assertThat(phone.masked()).isEqualTo("138****8000");
+            PhoneNumber phone = PhoneNumber.of("+8613800138000");
+            assertThat(phone.masked()).isEqualTo("+86****0138000");
         }
 
         @Test
         @DisplayName("masked should not reveal full number")
         void maskedShouldNotRevealFullNumber() {
-            PhoneNumber phone = PhoneNumber.of("15912345678");
+            PhoneNumber phone = PhoneNumber.of("+8615912345678");
             assertThat(phone.masked()).doesNotContain("1234");
-            assertThat(phone.masked()).isEqualTo("159****5678");
+            assertThat(phone.masked()).isEqualTo("+86****2345678");
         }
     }
 }

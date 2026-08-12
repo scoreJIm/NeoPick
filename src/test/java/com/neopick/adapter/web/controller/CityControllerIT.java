@@ -58,7 +58,7 @@ class CityControllerIT {
         void shouldReturnHotCities() throws Exception {
             CityJpaEntity shanghai = buildCity("SH", "Shanghai", 1, true);
 
-            when(cityJpaRepository.findByIsHotTrueOrderBySortOrderAsc())
+            when(cityJpaRepository.findByHotTrueOrderBySortOrderAsc())
                     .thenReturn(List.of(shanghai));
 
             mockMvc.perform(get("/api/v1/cities/hot"))
