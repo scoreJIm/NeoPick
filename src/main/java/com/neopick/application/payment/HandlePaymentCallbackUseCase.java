@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,18 +27,18 @@ public class HandlePaymentCallbackUseCase {
 
     private static final Logger log = LoggerFactory.getLogger(HandlePaymentCallbackUseCase.class);
 
-    private final PaymentGateway paymentGateway;
+    private final List<PaymentGateway> gateways;
     private final PaymentRepository paymentRepository;
     private final BookingRepository bookingRepository;
     private final NotificationRepository notificationRepository;
     private final BusinessMetrics metrics;
 
-    public HandlePaymentCallbackUseCase(PaymentGateway paymentGateway,
+    public HandlePaymentCallbackUseCase(List<PaymentGateway> gateways,
                                          PaymentRepository paymentRepository,
                                          BookingRepository bookingRepository,
                                          NotificationRepository notificationRepository,
                                          BusinessMetrics metrics) {
-        this.paymentGateway = paymentGateway;
+        this.gateways = gateways;
         this.paymentRepository = paymentRepository;
         this.bookingRepository = bookingRepository;
         this.notificationRepository = notificationRepository;
@@ -45,8 +46,9 @@ public class HandlePaymentCallbackUseCase {
     }
 
     @Transactional
-    public CallbackResult execute(Map<String, String> params) {
-        PaymentGateway.CallbackResult verified = paymentGateway.verifyCallback(params);
+    public CallbackResult execute(Map<String, String> params, String method) {
+        PaymentGateway gateway = resolveGateway(method);
+        PaymentGateway.CallbackResult verified = gateway.verifyCallback(params);
 
         if (!verified.signatureValid()) {
             log.warn("Payment callback rejected: invalid signature");
@@ -85,6 +87,14 @@ public class HandlePaymentCallbackUseCase {
                 outTradeNo, booking.getId().value(), verified.tradeNo());
 
         return new CallbackResult(true, outTradeNo);
+    }
+
+    private PaymentGateway resolveGateway(String method) {
+        return gateways.stream()
+                .filter(g -> g.supportedMethod().equalsIgnoreCase(method))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "No payment gateway found for method: " + method));
     }
 
     private void createNotifications(Payment payment, Booking booking) {

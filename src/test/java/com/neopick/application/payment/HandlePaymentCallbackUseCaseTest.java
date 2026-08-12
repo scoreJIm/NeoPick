@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -40,8 +41,9 @@ class HandlePaymentCallbackUseCaseTest {
         bookingRepository = mock(BookingRepository.class);
         notificationRepository = mock(NotificationRepository.class);
         metrics = new BusinessMetrics(new SimpleMeterRegistry());
+        when(paymentGateway.supportedMethod()).thenReturn("ALIPAY");
         useCase = new HandlePaymentCallbackUseCase(
-                paymentGateway, paymentRepository, bookingRepository,
+                List.of(paymentGateway), paymentRepository, bookingRepository,
                 notificationRepository, metrics);
     }
 
@@ -85,7 +87,7 @@ class HandlePaymentCallbackUseCaseTest {
             when(bookingRepository.save(any())).thenReturn(booking);
             when(notificationRepository.save(any())).thenReturn(null);
 
-            var result = useCase.execute(params);
+            var result = useCase.execute(params, "ALIPAY");
 
             assertThat(result.success()).isTrue();
             assertThat(result.outTradeNo()).isEqualTo(paymentUuid.toString());
@@ -108,7 +110,7 @@ class HandlePaymentCallbackUseCaseTest {
                     .thenReturn(new PaymentGateway.CallbackResult(
                             false, false, null, null, null, null));
 
-            var result = useCase.execute(params);
+            var result = useCase.execute(params, "ALIPAY");
 
             assertThat(result.success()).isFalse();
             verify(paymentRepository, never()).save(any());
@@ -146,7 +148,7 @@ class HandlePaymentCallbackUseCaseTest {
             when(paymentRepository.findById(new PaymentId(paymentUuid)))
                     .thenReturn(Optional.of(alreadyPaid));
 
-            var result = useCase.execute(params);
+            var result = useCase.execute(params, "ALIPAY");
 
             assertThat(result.success()).isTrue();
             verify(bookingRepository, never()).save(any());

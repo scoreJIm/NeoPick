@@ -16,6 +16,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -26,6 +29,8 @@ import java.util.Map;
 @Tag(name = "Payments", description = "Payment initiation and callback handling")
 @SecurityRequirement(name = "bearerAuth")
 public class PaymentController {
+
+    private static final Logger log = LoggerFactory.getLogger(PaymentController.class);
 
     private final InitiatePaymentUseCase initiatePaymentUseCase;
     private final HandlePaymentCallbackUseCase handlePaymentCallbackUseCase;
@@ -71,7 +76,7 @@ public class PaymentController {
     })
     public ApiResponse<String> alipayCallback(HttpServletRequest request) {
         Map<String, String> params = extractParams(request);
-        var result = handlePaymentCallbackUseCase.execute(params);
+        var result = handlePaymentCallbackUseCase.execute(params, "ALIPAY");
         if (result.success()) {
             return ApiResponse.success("success");
         }
@@ -81,13 +86,35 @@ public class PaymentController {
     @PostMapping("/callback/wechat")
     @RateLimit(limit = 60, windowSeconds = 60, scope = "IP")
     @Timed(value = "neopick.payments.wechat_callback", description = "WeChat payment callback")
-    @Operation(summary = "WeChat payment callback", description = "Handles asynchronous payment notification callback from WeChat Pay. Currently a stub.")
+    @Operation(summary = "WeChat payment callback", description = "Handles asynchronous payment notification from WeChat Pay. Verifies the notification signature, decrypts the resource, and updates payment and booking status.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Callback processed successfully"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid callback payload", content = @Content)
     })
-    public ApiResponse<Void> wechatCallback(@RequestBody String body) {
-        return ApiResponse.success();
+    public Map<String, String> wechatCallback(@RequestBody String body, @RequestHeader HttpHeaders headers) {
+        Map<String, String> params = new HashMap<>();
+        params.put("body", body);
+        params.put("wechatpay-signature", headers.getFirst("Wechatpay-Signature"));
+        params.put("wechatpay-timestamp", headers.getFirst("Wechatpay-Timestamp"));
+        params.put("wechatpay-nonce", headers.getFirst("Wechatpay-Nonce"));
+        params.put("wechatpay-serial", headers.getFirst("Wechatpay-Serial"));
+
+        Map<String, String> response = new HashMap<>();
+        try {
+            var result = handlePaymentCallbackUseCase.execute(params, "WECHAT");
+            if (result.success()) {
+                response.put("code", "SUCCESS");
+                response.put("message", "成功");
+            } else {
+                response.put("code", "FAIL");
+                response.put("message", "失败");
+            }
+        } catch (Exception e) {
+            log.warn("WeChat callback processing failed", e);
+            response.put("code", "FAIL");
+            response.put("message", "失败");
+        }
+        return response;
     }
 
     @GetMapping("/{paymentId}/status")

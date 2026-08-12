@@ -129,5 +129,8 @@ neopick:
     wechat:
       app-id: ${WECHAT_APP_ID:}
       mch-id: ${WECHAT_MCH_ID:}
-      api-key: ${WECHAT_API_KEY:}
+      api-v3-key: ${WECHAT_API_V3_KEY:}
+      private-key: ${WECHAT_PRIVATE_KEY:}
+      serial-no: ${WECHAT_SERIAL_NO:}
       notify-url: ${WECHAT_NOTIFY_URL:}
+      platform-cert: ${WECHAT_PLATFORM_CERT:}

@@ -84,8 +84,11 @@ public record NeopickProperties(
         public record WechatProperties(
                 String appId,
                 String mchId,
-                String apiKey,
-                String notifyUrl
+                String apiV3Key,
+                String privateKey,
+                String serialNo,
+                String notifyUrl,
+                String platformCert
         ) {}
     }
 }

@@ -9,6 +9,7 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -24,6 +25,7 @@ import java.util.UUID;
  * Uses direct HTTP with RSA2 signing instead of the Alipay SDK for a minimal footprint.
  */
 @Component
+@Primary
 public class AlipayPaymentGateway implements PaymentGateway {
 
     private static final Logger log = LoggerFactory.getLogger(AlipayPaymentGateway.class);
