@@ -89,6 +89,17 @@ data:
   NEOPICK_S3_BUCKET: "${S3_BUCKET}"
   NEOPICK_CDN_DOMAIN: "${CDN_DOMAIN}"
 ---
+# =============================================================================
+# WARNING: This Secret uses stringData for local development and CI only.
+# The values are replaced at deploy time via envsubst or CI pipeline variables.
+# Do NOT use this in production. Instead, use one of:
+#
+#   - Sealed Secrets       (see k8s/sealed-secret.yaml)
+#   - External Secrets Operator (see k8s/external-secret.yaml + k8s/secret-store.yaml)
+#   - HashiCorp Vault      (see docs/SECRETS.md)
+#
+# See docs/SECRETS.md for full setup instructions.
+# =============================================================================
 apiVersion: v1
 kind: Secret
 metadata:

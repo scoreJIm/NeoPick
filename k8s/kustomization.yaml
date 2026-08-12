@@ -9,6 +9,33 @@ resources:
   - pdb.yaml
   - prometheus-rules.yaml
 
+# =============================================================================
+# Production Secrets (uncomment ONE of the options below)
+# =============================================================================
+#
+# Option A: Sealed Secrets (encrypted secrets safe to commit to Git)
+#   Prerequisites: Sealed Secrets controller installed + kubeseal CLI
+#   Setup: ./scripts/secrets-setup.sh sealed
+#   Docs:  docs/SECRETS.md
+#
+#   - sealed-secret.yaml
+#
+# Option B: External Secrets Operator with AWS Secrets Manager
+#   Prerequisites: ESO installed + AWS credentials + secrets in AWS SM
+#   Setup: ./scripts/secrets-setup.sh eso
+#   Docs:  docs/SECRETS.md
+#
+#   - secret-store.yaml
+#   - external-secret.yaml
+#
+# Option C: HashiCorp Vault (not included in kustomization by default)
+#   Setup: ./scripts/secrets-setup.sh vault
+#   Docs:  docs/SECRETS.md
+#
+# IMPORTANT: When using any production option, remove or comment out
+# the secretGenerator block below to avoid overriding the managed Secret.
+# =============================================================================
+
 commonLabels:
   app.kubernetes.io/name: neopick-api
   app.kubernetes.io/part-of: neopick
