@@ -40,6 +40,7 @@ public class PaymentController {
     }
 
     @PostMapping
+    @RateLimit(limit = 5, windowSeconds = 60, scope = "USER")
     @Timed(value = "neopick.payments.initiate", description = "Initiate payment")
     @Operation(summary = "Initiate payment for a booking", description = "Initiates a payment for a confirmed booking. Returns a payment record with a payment URL for the selected method (Alipay or WeChat).")
     @ApiResponses({
@@ -61,6 +62,7 @@ public class PaymentController {
     }
 
     @PostMapping("/callback/alipay")
+    @RateLimit(limit = 60, windowSeconds = 60, scope = "IP")
     @Timed(value = "neopick.payments.alipay_callback", description = "Alipay payment callback")
     @Operation(summary = "Alipay payment callback", description = "Handles asynchronous payment notification from Alipay. Verifies signature, updates payment and booking status, and creates notifications.")
     @ApiResponses({
@@ -77,6 +79,7 @@ public class PaymentController {
     }
 
     @PostMapping("/callback/wechat")
+    @RateLimit(limit = 60, windowSeconds = 60, scope = "IP")
     @Timed(value = "neopick.payments.wechat_callback", description = "WeChat payment callback")
     @Operation(summary = "WeChat payment callback", description = "Handles asynchronous payment notification callback from WeChat Pay. Currently a stub.")
     @ApiResponses({

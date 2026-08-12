@@ -33,6 +33,7 @@ public class MessageController {
     }
 
     @GetMapping("/conversations")
+    @RateLimit(limit = 60, windowSeconds = 60, scope = "USER")
     @Timed(value = "neopick.messages.list_conversations", description = "List conversations")
     @Operation(summary = "List conversations", description = "Returns all conversations for the authenticated user, ordered by most recent message.")
     @ApiResponses({
@@ -61,6 +62,7 @@ public class MessageController {
     }
 
     @GetMapping("/conversations/{id}/messages")
+    @RateLimit(limit = 60, windowSeconds = 60, scope = "USER")
     @Timed(value = "neopick.messages.get_messages", description = "Get conversation messages")
     @Operation(summary = "Get conversation messages", description = "Returns messages for a specific conversation, paginated with newest last.")
     @ApiResponses({
@@ -77,6 +79,7 @@ public class MessageController {
     }
 
     @PostMapping("/conversations/{id}/messages")
+    @RateLimit(limit = 30, windowSeconds = 60, scope = "USER")
     @Timed(value = "neopick.messages.send", description = "Send message")
     @Operation(summary = "Send a message", description = "Sends a message in an existing conversation. The message is delivered in real-time via WebSocket if the recipient is online.")
     @ApiResponses({

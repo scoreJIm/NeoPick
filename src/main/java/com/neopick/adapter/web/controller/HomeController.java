@@ -28,6 +28,7 @@ public class HomeController {
     }
 
     @GetMapping
+    @RateLimit(limit = 30, windowSeconds = 60)
     @Timed(value = "neopick.home.get", description = "Get home page")
     @Operation(summary = "Get homepage data", description = "Returns aggregated homepage content including banners, categories, popular teachers, and featured teachers for the specified city.")
     @ApiResponses({

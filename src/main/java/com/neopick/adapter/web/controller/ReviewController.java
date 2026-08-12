@@ -35,6 +35,7 @@ public class ReviewController {
     }
 
     @PostMapping
+    @RateLimit(limit = 5, windowSeconds = 60, scope = "USER")
     @Timed(value = "neopick.reviews.submit", description = "Submit review")
     @Operation(summary = "Submit a review", description = "Submits a review for a completed booking. Includes rating (1-5), optional content text, and tags.")
     @ApiResponses({
@@ -52,6 +53,7 @@ public class ReviewController {
     }
 
     @GetMapping("/my")
+    @RateLimit(limit = 30, windowSeconds = 60, scope = "USER")
     @Timed(value = "neopick.reviews.my", description = "Get my reviews")
     @Operation(summary = "Get my reviews", description = "Returns the authenticated student's submitted reviews, ordered by most recent first.")
     @ApiResponses({

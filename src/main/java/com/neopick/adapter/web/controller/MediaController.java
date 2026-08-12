@@ -62,6 +62,7 @@ public class MediaController {
     }
 
     @PostMapping("/presign")
+    @RateLimit(limit = 10, windowSeconds = 60, scope = "USER")
     @Timed(value = "neopick.media.presign", description = "Generate presigned upload URL")
     @Operation(summary = "Generate presigned upload URL", description = "Generates a time-limited presigned URL for direct file upload to cloud storage. Validates content type and file size before issuing the URL.")
     @ApiResponses({

@@ -30,6 +30,7 @@ public class NotificationController {
     }
 
     @GetMapping
+    @RateLimit(limit = 60, windowSeconds = 60, scope = "USER")
     @Timed(value = "neopick.notifications.list", description = "List notifications")
     @Operation(summary = "List notifications", description = "Returns the authenticated user's notifications, optionally filtered by type. Results are paginated.")
     @ApiResponses({
@@ -45,6 +46,7 @@ public class NotificationController {
     }
 
     @PutMapping("/{id}/read")
+    @RateLimit(limit = 60, windowSeconds = 60, scope = "USER")
     @Timed(value = "neopick.notifications.mark_read", description = "Mark notification as read")
     @Operation(summary = "Mark notification as read", description = "Marks a single notification as read by its ID.")
     @ApiResponses({
@@ -59,6 +61,7 @@ public class NotificationController {
     }
 
     @PutMapping("/read-all")
+    @RateLimit(limit = 60, windowSeconds = 60, scope = "USER")
     @Timed(value = "neopick.notifications.mark_all_read", description = "Mark all notifications as read")
     @Operation(summary = "Mark all notifications as read", description = "Marks all of the authenticated user's notifications as read in a single operation.")
     @ApiResponses({
@@ -71,6 +74,7 @@ public class NotificationController {
     }
 
     @GetMapping("/unread-count")
+    @RateLimit(limit = 60, windowSeconds = 60, scope = "USER")
     @Timed(value = "neopick.notifications.unread_count", description = "Get unread notification count")
     @Operation(summary = "Get unread notification count", description = "Returns the total count of unread notifications for the authenticated user.")
     @ApiResponses({

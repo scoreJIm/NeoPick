@@ -30,6 +30,7 @@ public class FavoriteController {
     }
 
     @PostMapping
+    @RateLimit(limit = 20, windowSeconds = 60, scope = "USER")
     @Timed(value = "neopick.favorites.add", description = "Add favorite")
     @Operation(summary = "Add teacher to favorites", description = "Adds a teacher to the authenticated student's favorites list.")
     @ApiResponses({
@@ -45,6 +46,7 @@ public class FavoriteController {
     }
 
     @DeleteMapping("/{teacherId}")
+    @RateLimit(limit = 20, windowSeconds = 60, scope = "USER")
     @Timed(value = "neopick.favorites.remove", description = "Remove favorite")
     @Operation(summary = "Remove teacher from favorites", description = "Removes a teacher from the authenticated student's favorites list.")
     @ApiResponses({
@@ -59,6 +61,7 @@ public class FavoriteController {
     }
 
     @GetMapping
+    @RateLimit(limit = 30, windowSeconds = 60, scope = "USER")
     @Timed(value = "neopick.favorites.list", description = "List favorites")
     @Operation(summary = "List favorite teachers", description = "Returns the authenticated student's favorited teachers, paginated.")
     @ApiResponses({
@@ -73,6 +76,7 @@ public class FavoriteController {
     }
 
     @GetMapping("/check/{teacherId}")
+    @RateLimit(limit = 30, windowSeconds = 60, scope = "USER")
     @Timed(value = "neopick.favorites.check", description = "Check favorite status")
     @Operation(summary = "Check favorite status", description = "Checks whether a specific teacher is in the authenticated student's favorites list.")
     @ApiResponses({
