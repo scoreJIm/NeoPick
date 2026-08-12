@@ -18,4 +18,6 @@ public interface ConversationRepository {
     ChatMessage saveMessage(ChatMessage message);
 
     List<ChatMessage> findMessages(String conversationId, int page, int size);
+
+    void markMessagesAsRead(String conversationId, String readerId);
 }

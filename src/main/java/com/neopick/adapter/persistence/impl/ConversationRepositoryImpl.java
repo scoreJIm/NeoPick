@@ -70,6 +70,11 @@ public class ConversationRepositoryImpl implements ConversationRepository {
     }
 
     @Override
+    public void markMessagesAsRead(String conversationId, String readerId) {
+        msgRepo.markAsReadByConversationIdAndReceiverId(conversationId, readerId);
+    }
+
+    @Override
     public List<ChatMessage> findMessages(String conversationId, int page, int size) {
         return msgRepo.findByConversationIdOrderBySentAtDesc(conversationId, PageRequest.of(page, size))
                 .stream().map(e -> new ChatMessage(e.getId(), e.getConversationId(),

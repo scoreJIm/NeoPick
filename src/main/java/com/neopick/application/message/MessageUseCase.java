@@ -40,6 +40,11 @@ public class MessageUseCase {
     @Transactional
     public ChatMessage sendMessage(SendMessageCommand command) {
         String senderId = securityContext.requireCurrentUserId();
+        return sendMessage(senderId, command);
+    }
+
+    @Transactional
+    public ChatMessage sendMessage(String senderId, SendMessageCommand command) {
         Conversation conv = conversationRepository.findById(
                         ConversationId.from(command.conversationId()))
                 .orElseThrow(() -> new IllegalArgumentException("Conversation not found"));
@@ -50,6 +55,13 @@ public class MessageUseCase {
         conv.updateLastMessage(command.content(), message.getSentAt());
         conversationRepository.save(conv);
         return conversationRepository.saveMessage(message);
+    }
+
+    @Transactional
+    public void markMessagesAsRead(String conversationId, String readerId) {
+        conversationRepository.findById(ConversationId.from(conversationId))
+                .orElseThrow(() -> new IllegalArgumentException("Conversation not found"));
+        conversationRepository.markMessagesAsRead(conversationId, readerId);
     }
 
     public record SendMessageCommand(String conversationId, String content) {}

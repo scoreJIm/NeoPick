@@ -29,6 +29,10 @@ public class ChatMessage {
         this.sentAt = LocalDateTime.now();
     }
 
+    public void markAsRead() {
+        this.read = true;
+    }
+
     public UUID getId() { return id; }
     public String getConversationId() { return conversationId; }
     public String getSenderId() { return senderId; }
