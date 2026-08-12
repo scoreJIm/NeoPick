@@ -9,4 +9,8 @@ public record NotificationId(UUID value) implements ValueObject {
     public static NotificationId generate() {
         return new NotificationId(UUID.randomUUID());
     }
+
+    public static NotificationId from(String value) {
+        return new NotificationId(UUID.fromString(value));
+    }
 }

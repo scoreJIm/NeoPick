@@ -31,7 +31,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(@NonNull MessageBrokerRegistry config) {
         // Enable a simple in-memory message broker for /topic (public) and /queue (user-specific)
-        config.enableSimpleBroker("/topic", "/queue");
+        // Heartbeat: 10000ms server-to-client, 10000ms client-to-server
+        config.enableSimpleBroker("/topic", "/queue")
+                .setHeartbeatValue(new long[]{10000, 10000});
         // Application destination prefix: messages routed to @MessageMapping methods
         config.setApplicationDestinationPrefixes("/app");
         // User destination prefix: messages sent to /user/... are routed to specific users
