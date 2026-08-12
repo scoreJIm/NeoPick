@@ -26,7 +26,7 @@
         <aws-sdk.version>2.29.16</aws-sdk.version>
         <springdoc.version>2.7.0</springdoc.version>
         <jacoco.version>0.8.12</jacoco.version>
-        <checkstyle.version>3.6.0</checkstyle.version>
+        <checkstyle.version>3.1.2</checkstyle.version>
         <resilience4j.version>2.2.0</resilience4j.version>
     </properties>
 
@@ -225,6 +225,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
                 <configuration>
                     <annotationProcessorPaths>
                         <path>
@@ -296,7 +297,7 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <phase>validate</phase>
+                        <phase>verify</phase>
                         <goals>
                             <goal>check</goal>
                         </goals>
