@@ -1,0 +1,136 @@
+spring:
+  application:
+    name: neopick-api
+  profiles:
+    active: dev
+  cache:
+    type: redis
+    redis:
+      time-to-live: 300000
+      cache-null-values: false
+      key-prefix: "neopick:cache:"
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+    serialization:
+      write-dates-as-timestamps: false
+    default-property-inclusion: non_null
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when_authorized
+      probes:
+        enabled: true
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  metrics:
+    tags:
+      application: neopick-api
+    export:
+      prometheus:
+        enabled: true
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+      slo:
+        http:
+          server:
+            requests: 50ms, 100ms, 200ms, 500ms, 1s, 2s
+  tracing:
+    sampling:
+      probability: 0.1
+  otlp:
+    tracing:
+      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318/v1/traces}
+      transport: http
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: method
+  api-docs:
+    path: /v3/api-docs
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      smsService:
+        sliding-window-size: 10
+        minimum-number-of-calls: 3
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 30s
+        permitted-number-of-calls-in-half-open-state: 3
+      paymentGateway:
+        sliding-window-size: 10
+        minimum-number-of-calls: 3
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 30s
+        permitted-number-of-calls-in-half-open-state: 3
+      s3Storage:
+        sliding-window-size: 10
+        minimum-number-of-calls: 3
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 30s
+        permitted-number-of-calls-in-half-open-state: 3
+  retry:
+    instances:
+      s3Storage:
+        max-attempts: 3
+        wait-duration: 2s
+        exponential-backoff-multiplier: 2
+  timelimiter:
+    instances:
+      paymentGateway:
+        timeout-duration: 15s
+
+neopick:
+  jwt:
+    access-token-expiration: 2h
+    refresh-token-expiration: 30d
+  sms:
+    code-length: 6
+    code-ttl: 300
+    resend-cooldown: 60
+    daily-limit: 5
+  booking:
+    pending-confirm-timeout: 24h
+    pending-pay-timeout: 2h
+  s3:
+    bucket: ${S3_BUCKET:neopick-dev}
+    region: ${AWS_REGION:us-east-1}
+    presign-upload-duration: 300
+    presign-download-duration: 3600
+  cdn:
+    domain: ${CDN_DOMAIN:https://cdn.neopick.com}
+  media:
+    max-file-size: 5242880
+    allowed-types: image/jpeg,image/png,image/webp
+  payment:
+    alipay:
+      app-id: ${ALIPAY_APP_ID:}
+      private-key: ${ALIPAY_PRIVATE_KEY:}
+      alipay-public-key: ${ALIPAY_PUBLIC_KEY:}
+      gateway-url: ${ALIPAY_GATEWAY:https://openapi-sandbox.dl.alipaydev.com/gateway.do}
+      notify-url: ${ALIPAY_NOTIFY_URL:https://api.neopick.com/api/v1/payments/callback/alipay}
+      return-url: ${ALIPAY_RETURN_URL:https://neopick.com/payment/result}
+    wechat:
+      app-id: ${WECHAT_APP_ID:}
+      mch-id: ${WECHAT_MCH_ID:}
+      api-v3-key: ${WECHAT_API_V3_KEY:}
+      private-key: ${WECHAT_PRIVATE_KEY:}
+      serial-no: ${WECHAT_SERIAL_NO:}
+      notify-url: ${WECHAT_NOTIFY_URL:}
+      platform-cert: ${WECHAT_PLATFORM_CERT:}

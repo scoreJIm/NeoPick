@@ -1,0 +1,90 @@
+spring:
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: 6379
+      ssl:
+        # Plaintext Redis container (not ElastiCache). Set REDIS_SSL=true only
+        # if switching to ElastiCache with encryption-in-transit.
+        enabled: ${REDIS_SSL:false}
+
+neopick:
+  jwt:
+    secret: ${JWT_SECRET}
+  sms:
+    provider: aliyun
+    aliyun:
+      access-key-id: ${ALIYUN_ACCESS_KEY_ID}
+      access-key-secret: ${ALIYUN_ACCESS_KEY_SECRET}
+      sign-name: Neopick
+      template-code: ${ALIYUN_SMS_TEMPLATE_CODE}
+  aws:
+    region: us-east-1
+    s3:
+      bucket: neopick-prod-media
+  s3:
+    bucket: ${S3_BUCKET:neopick-prod-media}
+    region: ${AWS_REGION:us-east-1}
+    presign-upload-duration: 300
+    presign-download-duration: 3600
+  cdn:
+    domain: ${CDN_DOMAIN:https://cdn.neopick.com}
+  media:
+    max-file-size: 5242880
+    allowed-types: image/jpeg,image/png,image/webp
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+    prometheus:
+      enabled: true
+  metrics:
+    tags:
+      application: neopick-api
+      environment: prod
+    export:
+      prometheus:
+        enabled: true
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+      slo:
+        http:
+          server:
+            requests: 50ms, 100ms, 200ms, 500ms, 1s, 2s
+  tracing:
+    sampling:
+      probability: 0.1
+  otlp:
+    tracing:
+      export:
+        enabled: false
+
+logging:
+  level:
+    com.neopick: INFO
+    org.springframework.web: WARN

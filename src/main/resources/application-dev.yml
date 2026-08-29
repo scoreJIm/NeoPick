@@ -1,0 +1,49 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/neopick
+    username: ${DATABASE_USERNAME:neopick}
+    password: ${DATABASE_PASSWORD:neopick_dev}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+neopick:
+  jwt:
+    secret: ${JWT_SECRET:dev-secret-key-change-in-production-must-be-at-least-256-bits}
+  sms:
+    provider: mock
+  aws:
+    region: us-east-1
+    s3:
+      bucket: neopick-dev-media
+  s3:
+    bucket: neopick-dev-media
+    region: us-east-1
+    presign-upload-duration: 300
+    presign-download-duration: 3600
+  cdn:
+    domain: https://cdn.neopick.dev
+  media:
+    max-file-size: 5242880
+    allowed-types: image/jpeg,image/png,image/webp
+
+logging:
+  level:
+    com.neopick: DEBUG
+    org.springframework.web: INFO
+    org.hibernate.SQL: DEBUG
