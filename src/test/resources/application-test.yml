@@ -1,0 +1,54 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: false
+    database-platform: org.hibernate.dialect.H2Dialect
+    properties:
+      hibernate:
+        format_sql: false
+  flyway:
+    enabled: false
+  h2:
+    console:
+      enabled: false
+  cache:
+    type: none
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+      - org.springframework.boot.autoconfigure.websocket.servlet.WebSocketMessagingAutoConfiguration
+  sql:
+    init:
+      mode: never
+
+neopick:
+  jwt:
+    secret: test-secret-at-least-256-bits-long-for-hs256-algorithm
+  sms:
+    provider: mock
+  aws:
+    region: us-east-1
+    s3:
+      bucket: neopick-test
+  s3:
+    bucket: neopick-test
+    region: us-east-1
+    presign-upload-duration: 300
+    presign-download-duration: 3600
+  cdn:
+    domain: https://cdn.neopick.test
+  media:
+    max-file-size: 5242880
+    allowed-types: image/jpeg,image/png,image/webp
+
+logging:
+  level:
+    com.neopick: WARN
+    org.springframework: WARN
