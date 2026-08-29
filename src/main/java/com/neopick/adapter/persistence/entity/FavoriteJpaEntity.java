@@ -1,6 +1,8 @@
 package com.neopick.adapter.persistence.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.time.LocalDateTime;
 
 @Entity
@@ -13,6 +15,7 @@ public class FavoriteJpaEntity {
     private Long id;
 
     @Column(name = "student_id", nullable = false)
+    @JdbcTypeCode(SqlTypes.UUID)
     private String studentId;
 
     @Column(name = "teacher_id", nullable = false)

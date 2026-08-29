@@ -1,6 +1,8 @@
 package com.neopick.adapter.persistence.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -13,6 +15,7 @@ public class NotificationJpaEntity {
     private UUID id;
 
     @Column(name = "user_id", nullable = false)
+    @JdbcTypeCode(SqlTypes.UUID)
     private String userId;
 
     @Column(name = "title", nullable = false, length = 200)

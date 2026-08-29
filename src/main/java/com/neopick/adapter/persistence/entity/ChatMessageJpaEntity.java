@@ -1,6 +1,8 @@
 package com.neopick.adapter.persistence.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -13,12 +15,15 @@ public class ChatMessageJpaEntity {
     private UUID id;
 
     @Column(name = "conversation_id", nullable = false)
+    @JdbcTypeCode(SqlTypes.UUID)
     private String conversationId;
 
     @Column(name = "sender_id", nullable = false)
+    @JdbcTypeCode(SqlTypes.UUID)
     private String senderId;
 
     @Column(name = "receiver_id", nullable = false)
+    @JdbcTypeCode(SqlTypes.UUID)
     private String receiverId;
 
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")

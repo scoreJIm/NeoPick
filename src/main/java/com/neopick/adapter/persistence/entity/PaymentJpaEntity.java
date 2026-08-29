@@ -1,6 +1,8 @@
 package com.neopick.adapter.persistence.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -14,6 +16,7 @@ public class PaymentJpaEntity {
     private UUID id;
 
     @Column(name = "booking_id", nullable = false, unique = true)
+    @JdbcTypeCode(SqlTypes.UUID)
     private String bookingId;
 
     @Column(name = "amount", nullable = false, precision = 10, scale = 2)
