@@ -37,6 +37,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/teachers/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/cities/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/media/**").permitAll()
+                        // static Vue frontend + its SPA routes (history mode)
+                        .requestMatchers("/", "/index.html", "/assets/**", "/favicon.ico").permitAll()
+                        .requestMatchers("/login", "/bookings", "/chat", "/teachers/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
