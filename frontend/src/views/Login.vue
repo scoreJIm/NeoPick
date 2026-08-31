@@ -21,10 +21,11 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth.js'
 
 const router = useRouter()
+const route = useRoute()
 const auth = useAuthStore()
 const phone = ref('')
 const code = ref('')
@@ -51,7 +52,7 @@ async function doLogin() {
   loggingIn.value = true
   try {
     await auth.login(phone.value, code.value)
-    router.push('/')
+    router.push(typeof route.query.redirect === 'string' ? route.query.redirect : '/')
   } catch (e) {
     error.value = e.response?.data?.message || 'Invalid code'
   } finally {

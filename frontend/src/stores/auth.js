@@ -9,13 +9,15 @@ export const useAuthStore = defineStore('auth', {
 
   actions: {
     async sendSms(phone) {
-      await api.post('/auth/send-sms', { phoneNumber: phone })
+      await api.post('/auth/send-sms-code', { phone })
     },
 
     async login(phone, code) {
-      const { data } = await api.post('/auth/login', { phoneNumber: phone, smsCode: code })
-      localStorage.setItem('accessToken', data.accessToken)
-      localStorage.setItem('refreshToken', data.refreshToken)
+      const { data } = await api.post('/auth/login', { phone, code })
+      const accessToken = data.accessToken ?? data.access_token
+      const refreshToken = data.refreshToken ?? data.refresh_token
+      localStorage.setItem('accessToken', accessToken)
+      localStorage.setItem('refreshToken', refreshToken)
       this.isLoggedIn = true
       this.user = data.user
       return data
